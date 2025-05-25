@@ -49,10 +49,16 @@
                                 <tbody>
                                     @foreach($roles as $role)
                                         <tr>
-                                            <td>{{ $role->name }}</td>
+                                            @if($role->name == 'admin')
+                                                <td>Quản trị viên</td>
+                                            @elseif($role->name == 'teacher')
+                                                <td>Giảng viên</td>
+                                            @elseif($role->name == 'student')
+                                                <td>Sinh viên</td>
+                                            @endif
                                             <td>
                                                 @foreach($role->permissions as $permission)
-                                                    <span class="badge badge-primary">{{ $permission->name }}</span>
+                                                    <span class="badge badge-primary">{{ $permission->description }}</span>
                                                 @endforeach
                                             </td>
                                             <td>

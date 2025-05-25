@@ -49,14 +49,15 @@
                                             <td><span class="text-primary font-weight-bold">{{ $user->name }}</span></td>
                                             <td><a href="mailto:{{ $user->email }}">{{ $user->email }}</a></td>
                                             <td>
-                                                {{$user->role}}
-                                                @if($user->role === 'admin')
-                                                    <span class="badge badge-danger">Admin</span>
-                                                @elseif($user->role === 'teacher')
-                                                    <span class="badge badge-warning">Manager</span>
-                                                @else
-                                                    <span class="badge badge-secondary">User</span>
-                                                @endif
+                                                @foreach($user->roles as $role)
+                                                    @if($role->name === 'admin')
+                                                        <span class="badge badge-danger">Quản trị viên</span>
+                                                    @elseif($role->name === 'teacher')
+                                                        <span class="badge badge-warning">Giảng viên</span>
+                                                    @elseif($role->name === 'student')
+                                                        <span class="badge badge-info">Sinh viên</span>
+                                                    @endif
+                                                @endforeach
                                             </td>
                                             <td>
                                                 @if($user->department)

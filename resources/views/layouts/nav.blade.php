@@ -73,7 +73,6 @@
                 </ul>
             </li>
 
-            @role('admin')
             <li class="nav-label">Quản lý bảo trì</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
@@ -84,7 +83,7 @@
                     <li><a href="{{ route('maintenances.create') }}">Thêm bảo trì</a></li>
                 </ul>
             </li>
-
+            @role('admin')
             <li class="nav-label">Báo cáo</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">

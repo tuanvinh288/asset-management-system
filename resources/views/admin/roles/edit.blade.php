@@ -44,6 +44,7 @@
                             <div class="form-group">
                                 <label class="text-label">Vai trò</label>
                                 <input type="text" class="form-control" value="{{ $role->name }}" disabled>
+                                <input type="hidden" name="name" value="{{ $role->name }}">
                             </div>
 
                             <div class="form-group">
@@ -53,7 +54,7 @@
                                         <div class="col-md-3">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="permission_{{ $permission->id }}" name="permissions[]" value="{{ $permission->name }}" {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="permission_{{ $permission->id }}">{{ $permission->name }}</label>
+                                                <label class="custom-control-label" for="permission_{{ $permission->id }}">{{ $permission->description }}</label>
                                             </div>
                                         </div>
                                     @endforeach

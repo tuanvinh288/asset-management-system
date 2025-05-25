@@ -71,7 +71,13 @@
                                     <select name="role_id" class="form-control" id="role_id">
                                         @foreach(\Spatie\Permission\Models\Role::all() as $role)
                                             <option value="{{ $role->name }}" {{ (isset($user) && $user->hasRole($role->name)) ? 'selected' : '' }}>
-                                                {{ $role->name }}
+                                                @if($role->name === 'admin')
+                                                    Quản trị viên
+                                                @elseif($role->name === 'teacher')
+                                                    Giảng viên
+                                                @elseif($role->name === 'student')
+                                                    Sinh viên
+                                                @endif
                                             </option>
                                         @endforeach
                                     </select>
