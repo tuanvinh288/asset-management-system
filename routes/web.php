@@ -19,6 +19,11 @@ use App\Http\Controllers\admin\RoomBorrowController;
 use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\admin\SettingController;
 
+// Redirect root to login page
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
