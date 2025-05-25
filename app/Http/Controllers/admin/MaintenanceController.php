@@ -121,7 +121,7 @@ class MaintenanceController extends Controller
         if ($request->status === 'completed') {
             $deviceItem = DeviceItem::find($request->device_item_id);
             $deviceItem->update(['status' => 'available']);
-            
+
             if ($maintenance->type === 'periodic') {
                 $maintenance->calculateNextMaintenanceDate();
             }

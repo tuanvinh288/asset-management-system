@@ -18,7 +18,7 @@
                     <div class="card-header">
                         <h4 class="card-title">Danh sách mượn phòng</h4>
                         @role('admin')
-                        <a href="{{ route('borrow-room') }}" class="btn btn-primary">Đăng ký mượn mới</a>
+                        <a href="{{ route('room-borrows.create') }}" class="btn btn-primary">Đăng ký mượn mới</a>
                         @endrole
                     </div>
                     <div class="card-body">

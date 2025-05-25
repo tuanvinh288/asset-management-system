@@ -65,7 +65,7 @@
 
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                    <i class="icon-home menu-icon"></i><span class="nav-text">Mượn phòng</span>
+                    <i class="icon-handbag menu-icon"></i><span class="nav-text">Mượn phòng</span>
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('room-borrows.index') }}">Danh sách mượn</a></li>
