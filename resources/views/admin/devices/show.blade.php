@@ -96,6 +96,8 @@
                                         <td>
                                             @if($part->status == 'available')
                                                 <span class="badge badge-success">Có sẵn</span>
+                                            @elseif($part->status == 'pending')
+                                                <span class="badge badge-warning">Đang chờ duyệt</span>
                                             @elseif($part->status == 'in_use')
                                                 <span class="badge badge-info">Đang sử dụng</span>
                                             @elseif($part->status == 'maintenance')
@@ -105,21 +107,16 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @php
-                                                $hasBorrow = $part->borrowDetails->whereIn('borrow.status', ['pending', 'approved'])->count() > 0;
-                                                $hasMaintenance = $part->maintenances->whereIn('status', ['pending', 'in_progress'])->count() > 0;
-                                            @endphp
-
-                                            @if($hasBorrow)
-                                                <span class="badge badge-info">Đang được mượn</span>
-                                            @endif
-
-                                            @if($hasMaintenance)
-                                                <span class="badge badge-warning ml-1">Đang bảo trì</span>
-                                            @endif
-
-                                            @if(!$hasBorrow && !$hasMaintenance)
+                                            @if($part->status == 'available')
                                                 <span class="badge badge-success">Sẵn sàng</span>
+                                            @elseif($part->status == 'pending')
+                                                <span class="badge badge-warning">Đang chờ duyệt mượn</span>
+                                            @elseif($part->status == 'in_use')
+                                                <span class="badge badge-info">Đang được mượn</span>
+                                            @elseif($part->status == 'maintenance')
+                                                <span class="badge badge-warning">Đang bảo trì</span>
+                                            @elseif($part->status == 'broken')
+                                                <span class="badge badge-danger">Không thể sử dụng</span>
                                             @endif
                                         </td>
                                         <td>{{ $part->created_at->format('d/m/Y') }}</td>

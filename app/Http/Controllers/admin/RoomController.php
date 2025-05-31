@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class RoomController extends Controller
 {
@@ -73,11 +73,18 @@ class RoomController extends Controller
     public function destroy(Room $room)
     {
         try {
+            // Kiểm tra xem phòng có đang được sử dụng không
+            if ($room->status !== 'available') {
+                return redirect()->route('rooms.index')
+                    ->with('error', 'Không thể xóa phòng vì đang có người sử dụng.');
+            }
+
             $room->delete();
             return redirect()->route('rooms.index')
                 ->with('success', 'Phòng đã được xóa thành công.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+            return redirect()->route('rooms.index')
+                ->with('error', 'Đã xảy ra lỗi khi xóa phòng: ' . $e->getMessage());
         }
     }
 }

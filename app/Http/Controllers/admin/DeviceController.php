@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Device;
+use App\Models\Category;
 use App\Models\DeviceItem;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class DeviceController extends Controller
 {
@@ -41,13 +41,14 @@ class DeviceController extends Controller
         $device = Device::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:devices,name,' . $id,
             'borrower_type' => 'in:both,student,teacher',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'name.required' => 'Tên thiết bị là bắt buộc.',
+            'name.unique' => 'Tên thiết bị này đã tồn tại trong hệ thống.',
             'category_id.required' => 'Vui lòng chọn danh mục.',
             'category_id.exists' => 'Danh mục không hợp lệ.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
@@ -88,13 +89,14 @@ class DeviceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:devices,name',
             'borrower_type' => 'required|in:both,student,teacher',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'name.required' => 'Tên thiết bị là bắt buộc.',
+            'name.unique' => 'Tên thiết bị này đã tồn tại trong hệ thống.',
             'borrower_type.required' => 'Vui lòng chọn loại người mượn.',
             'borrower_type.in' => 'Loại người mượn không hợp lệ.',
             'category_id.required' => 'Vui lòng chọn danh mục.',
@@ -126,13 +128,11 @@ class DeviceController extends Controller
         try {
             $device = Device::with('deviceItems')->findOrFail($id);
 
-            // Kiểm tra xem có thiết bị con nào đang được mượn không
-            $borrowedItems = $device->deviceItems()->where('status', 'in_use')->count();
-            if ($borrowedItems > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Không thể xóa thiết bị vì có thiết bị con đang được mượn.'
-                ], 400);
+            // Kiểm tra xem có thiết bị con nào đang không ở trạng thái available không
+            $activeItems = $device->deviceItems()->whereNotIn('status', ['available'])->count();
+            if ($activeItems > 0) {
+                return redirect()->route('devices.index')
+                    ->with('error', 'Không thể xóa thiết bị vì có thiết bị con đang ở trạng thái: đang chờ duyệt, đang sử dụng, đang bảo trì hoặc hỏng.');
             }
 
             // Xóa ảnh nếu có
@@ -146,16 +146,11 @@ class DeviceController extends Controller
             // Xóa thiết bị
             $device->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Thiết bị đã được xóa thành công.'
-            ]);
+            return redirect()->route('devices.index')
+                ->with('success', 'Thiết bị đã được xóa thành công.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Đã xảy ra lỗi khi xóa thiết bị.',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->route('devices.index')
+                ->with('error', 'Đã xảy ra lỗi khi xóa thiết bị: ' . $e->getMessage());
         }
     }
 }

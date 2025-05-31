@@ -117,12 +117,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($borrow->deviceItems as $item)
+                                        @foreach($borrow->details as $detail)
                                         <tr>
-                                            <td>{{ $item->code }}</td>
-                                            <td>{{ $item->serial_number }}</td>
+                                            <td>{{ $detail->deviceItem->code }}</td>
+                                            <td>{{ $detail->deviceItem->serial_number }}</td>
                                             <td>
-                                                @switch($item->status)
+                                                @switch($detail->deviceItem->status)
                                                     @case('available')
                                                         <span class="badge badge-success">Có sẵn</span>
                                                         @break
@@ -145,18 +145,18 @@
                         </div>
 
                         <div class="form-group">
-                            <a href="{{ route('borrows.index') }}" class="btn btn-secondary">Quay lại</a>
+                            <a href="{{ route('device-borrows.index') }}" class="btn btn-secondary">Quay lại</a>
                             @if($borrow->status === 'pending')
-                                <form method="POST" action="{{ route('borrows.approve', $borrow->id) }}" style="display:inline;">
+                                <form method="POST" action="{{ route('device-borrows.approve', $borrow->id) }}" style="display:inline;">
                                     @csrf
                                     <button class="btn btn-success">Duyệt</button>
                                 </form>
-                                <form method="POST" action="{{ route('borrows.cancel', $borrow->id) }}" style="display:inline;">
+                                <form method="POST" action="{{ route('device-borrows.cancel', $borrow->id) }}" style="display:inline;">
                                     @csrf
                                     <button class="btn btn-danger">Hủy</button>
                                 </form>
                             @elseif($borrow->status === 'approved')
-                                <form method="POST" action="{{ route('borrows.return', $borrow->id) }}" style="display:inline;">
+                                <form method="POST" action="{{ route('device-borrows.return', $borrow->id) }}" style="display:inline;">
                                     @csrf
                                     <button class="btn btn-secondary">Trả thiết bị</button>
                                 </form>
