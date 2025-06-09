@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use DB;
-use App\Models\Device;
-use App\Models\Category;
 use App\Models\Unit;
-use App\Models\DeviceItem;
+use App\Models\Device;
 use Faker\Factory as Faker;
+use App\Models\Category;
+use App\Models\DeviceItem;
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DeviceSeeder extends Seeder
 {
@@ -43,7 +43,6 @@ class DeviceSeeder extends Seeder
                 'description' => 'Laptop phục vụ học tập và nghiên cứu',
                 'category_id' => 4, // Máy tính
                 'unit_id' => 1, // Cái
-                'is_fixed' => false
             ],
             [
                 'name' => 'Máy in',
@@ -56,21 +55,18 @@ class DeviceSeeder extends Seeder
                 'description' => 'Máy quét tài liệu',
                 'category_id' => 2, // Thiết bị văn phòng
                 'unit_id' => 1, // Cái
-                'is_fixed' => false
             ],
             [
                 'name' => 'Máy ảnh',
                 'description' => 'Máy ảnh phục vụ ghi hình',
                 'category_id' => 5, // Thiết bị ghi hình
                 'unit_id' => 1, // Cái
-                'is_fixed' => false
             ],
             [
                 'name' => 'Máy quay phim',
                 'description' => 'Máy quay phim phục vụ ghi hình',
                 'category_id' => 5, // Thiết bị ghi hình
                 'unit_id' => 1, // Cái
-                'is_fixed' => false
             ],
             [
                 'name' => 'Bàn ghế',
@@ -83,14 +79,12 @@ class DeviceSeeder extends Seeder
                 'description' => 'Tủ đựng tài liệu văn phòng',
                 'category_id' => 1, // Nội thất
                 'unit_id' => 1, // Cái
-                'is_fixed' => true
             ],
             [
                 'name' => 'Điều hòa',
                 'description' => 'Điều hòa không khí',
                 'category_id' => 1, // Nội thất
                 'unit_id' => 1, // Cái
-                'is_fixed' => true
             ]
         ];
 
