@@ -1,23 +1,24 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\admin\UserController;
-use App\Http\Controllers\admin\DeparmentController;
-use App\Http\Controllers\admin\CategoryController;
-use App\Http\Controllers\admin\DeviceController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\admin\RoleController;
+use App\Http\Controllers\admin\RoomController;
 use App\Http\Controllers\admin\UnitController;
-use App\Http\Controllers\admin\SupplierController;
-use App\Http\Controllers\admin\DeviceItemController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\BorrowController;
-use App\Http\Controllers\admin\DashboardController;
-use App\Http\Controllers\admin\MaintenanceController;
+use App\Http\Controllers\admin\DeviceController;
 use App\Http\Controllers\admin\QrCodeController;
 use App\Http\Controllers\admin\ReportController;
-use App\Http\Controllers\admin\RoomController;
-use App\Http\Controllers\admin\RoomBorrowController;
-use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\admin\SettingController;
+use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\SupplierController;
+use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\admin\DeparmentController;
+use App\Http\Controllers\admin\DeviceItemController;
+use App\Http\Controllers\admin\RoomBorrowController;
+use App\Http\Controllers\admin\MaintenanceController;
+use App\Http\Controllers\admin\NotificationController;
 
 // Redirect root to login page
 Route::get('/', function () {
@@ -90,6 +91,11 @@ Route::prefix('admin')->group(function () {
         // Settings
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        // Borrow routes
+        Route::get('/borrows/{borrow}/send-reminder', [BorrowController::class, 'sendReturnReminder'])->name('borrows.send-reminder');
+
+        // Room borrow routes
+        Route::get('/room-borrows/{roomBorrow}/send-reminder', [RoomBorrowController::class, 'sendReturnReminder'])->name('room-borrows.send-reminder');
     });
 });
 

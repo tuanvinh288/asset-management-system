@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\DeviceItem;
 use App\Models\Device;
+use App\Models\DeviceItem;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class DeviceItemController extends Controller
 {
@@ -27,7 +27,7 @@ class DeviceItemController extends Controller
             'device_id' => 'required|exists:devices,id',
             'items' => 'required|array|min:1',
             'items.*.code' => 'required|string|max:50|unique:device_items,code',
-            'items.*.status' => 'required|in:available,borrowed,damaged,maintenance',
+            'items.*.status' => 'required|in:available,pending,in_use,maintenance,broken',
         ], [
             'device_id.required' => 'Vui lòng chọn thiết bị.',
             'device_id.exists' => 'Thiết bị không tồn tại.',
@@ -58,12 +58,16 @@ class DeviceItemController extends Controller
     {
         $request->validate([
             'code' => 'required|string|max:50|unique:device_items,code,' . $id,
-            'status' => 'required|in:available,borrowed,damaged,maintenance',
+            'serial_number' => 'nullable|string|max:100',
+            'status' => 'required|in:available,pending,in_use,maintenance,broken',
+            'supplier_id' => 'nullable|exists:suppliers,id',
         ], [
             'code.required' => 'Mã thiết bị là bắt buộc.',
             'code.unique' => 'Mã thiết bị đã tồn tại.',
+            'serial_number.max' => 'Số serial không được vượt quá 100 ký tự.',
             'status.required' => 'Trạng thái là bắt buộc.',
             'status.in' => 'Trạng thái không hợp lệ.',
+            'supplier_id.exists' => 'Nhà cung cấp không tồn tại.',
         ]);
 
         try {
@@ -71,17 +75,28 @@ class DeviceItemController extends Controller
 
             // Kiểm tra nếu thiết bị đang được mượn
             if ($item->status === 'in_use') {
-                return back()->with('error', 'Không thể cập nhật thiết bị đang được mượn.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không thể cập nhật thiết bị đang được mượn.'
+                ], 422);
             }
 
             $item->update([
                 'code' => $request->code,
+                'serial_number' => $request->serial_number,
                 'status' => $request->status,
+                'supplier_id' => $request->supplier_id,
             ]);
 
-            return redirect()->back()->with('success', 'Cập nhật thiết bị con thành công!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật thiết bị con thành công!'
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
         }
     }
 

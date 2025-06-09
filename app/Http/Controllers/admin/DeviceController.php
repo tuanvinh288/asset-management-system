@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Models\Unit;
 use App\Models\Device;
 use App\Models\Category;
+use App\Models\Supplier;
 use App\Models\DeviceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -23,17 +25,19 @@ class DeviceController extends Controller
 
     public function show($id)
     {
+        $suppliers = Supplier::all();
         $device = Device::with(['category.unit', 'deviceItems.borrowDetails.borrow', 'deviceItems.maintenances'])->findOrFail($id);
         $device_parts = $device->deviceItems;  // Sửa từ items thành deviceItems
 
-        return view('admin.devices.show', compact('device', 'device_parts'));
+        return view('admin.devices.show', compact('device', 'device_parts', 'suppliers'));
     }
 
     public function edit($id)
     {
         $device = Device::findOrFail($id);
         $categories = Category::all(); // nếu có dùng danh mục
-        return view('admin.devices.edit', compact('device', 'categories'));
+        $units = Unit::all();
+        return view('admin.devices.edit', compact('device', 'categories', 'units'));
     }
 
     public function update(Request $request, $id)
@@ -44,6 +48,7 @@ class DeviceController extends Controller
             'name' => 'required|string|max:255|unique:devices,name,' . $id,
             'borrower_type' => 'in:both,student,teacher',
             'category_id' => 'required|exists:categories,id',
+            'unit_id' => 'required|exists:units,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
@@ -57,6 +62,7 @@ class DeviceController extends Controller
         ]);
 
         $device->name = $request->name;
+        $device->unit_id = $request->unit_id;
         $device->category_id = $request->category_id;
         $device->borrower_type = $request->borrower_type;
         $device->description = $request->description;
@@ -82,7 +88,8 @@ class DeviceController extends Controller
     public function create()
     {
         $categories = Category::all(); // Lấy danh mục thiết bị
-        return view('admin.devices.create', compact('categories'));
+        $units = Unit::all();
+        return view('admin.devices.create', compact('categories', 'units'));
     }
 
     // Lưu thiết bị và chi tiết thiết bị

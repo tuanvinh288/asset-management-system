@@ -8,6 +8,8 @@ use App\Models\RoomBorrow;
 use App\Models\DeviceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Mail\ReturnReminder;
+use Illuminate\Support\Facades\Mail;
 
 class RoomBorrowController extends Controller
 {
@@ -101,7 +103,8 @@ class RoomBorrowController extends Controller
             }
 
             $roomBorrow->update([
-                'status' => 'returned'
+                'status' => 'returned',
+                'actual_return_date' => now()
             ]);
 
             DB::commit();
@@ -131,6 +134,27 @@ class RoomBorrowController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    public function sendReturnReminder(RoomBorrow $roomBorrow)
+    {
+        try {
+            // Load các relationship cần thiết
+            $roomBorrow->load(['user', 'room']);
+            
+            // Gửi email thông báo
+            Mail::to($roomBorrow->user->email)->send(new ReturnReminder($roomBorrow, 'room', false));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã gửi thông báo thành công!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi gửi thông báo: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

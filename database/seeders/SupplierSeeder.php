@@ -50,6 +50,42 @@ class SupplierSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Công ty TNHH Thiết bị Y tế Việt Mỹ',
+                'address' => '25 Lê Đức Thọ, Nam Từ Liêm, Hà Nội',
+                'phone' => '0243 789 1234',
+                'email' => 'info@vietmyequipment.com',
+                'note' => 'Chuyên cung cấp thiết bị y tế, dụng cụ phòng thí nghiệm',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Công ty CP Thiết bị Giáo dục Việt Nam',
+                'address' => 'Số 15 Đường Láng, Đống Đa, Hà Nội',
+                'phone' => '0243 456 7890',
+                'email' => 'contact@vnedu.vn',
+                'note' => 'Cung cấp thiết bị dạy học, đồ dùng học tập',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Công ty TNHH Công nghệ và Giải pháp FPT',
+                'address' => 'Tòa nhà FPT, Duy Tân, Cầu Giấy, Hà Nội',
+                'phone' => '0243 555 6666',
+                'email' => 'education@fpt.com.vn',
+                'note' => 'Cung cấp giải pháp CNTT, thiết bị công nghệ cho giáo dục',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Công ty TNHH Thiết bị Đo lường và Kiểm định',
+                'address' => 'Số 8 Trần Phú, Ba Đình, Hà Nội',
+                'phone' => '0243 777 8888',
+                'email' => 'sales@calibration.vn',
+                'note' => 'Cung cấp thiết bị đo lường, dụng cụ kiểm định chất lượng',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

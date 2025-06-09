@@ -32,9 +32,8 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="text-center" width="5%">#</th>
-                                            <th width="15%">Mã đơn vị</th>
                                             <th width="20%">Tên đơn vị</th>
-                                            <th>Mô tả</th>
+                                            <th width="15%">Viết tắt</th>
                                             <th width="12%">Ngày tạo</th>
                                             <th class="text-center" width="15%">Thao tác</th>
                                         </tr>
@@ -44,20 +43,12 @@
                                             <tr>
                                                 <td class="text-center"><strong>{{ $key + 1 }}</strong></td>
                                                 <td>
-                                                    <span class="badge badge-primary px-3 py-2">{{ $unit->code }}</span>
-                                                </td>
-                                                <td>
                                                     <div class="d-flex align-items-center">
-                                                    
                                                         <span class="font-weight-bold">{{ $unit->name }}</span>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    @if($unit->description)
-                                                        <span class="text-muted">{{ Str::limit($unit->description, 100) }}</span>
-                                                    @else
-                                                        <span class="text-muted">Không có mô tả</span>
-                                                    @endif
+                                                    <span class="badge badge-primary px-3 py-2">{{ $unit->symbol }}</span>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
@@ -103,19 +94,14 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="code">Mã đơn vị tính <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="code" name="code" required
-                                placeholder="Nhập mã đơn vị tính">
-                        </div>
-                        <div class="form-group">
                             <label for="name">Tên đơn vị tính <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required
                                 placeholder="Nhập tên đơn vị tính">
                         </div>
                         <div class="form-group">
-                            <label for="description">Mô tả</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" 
-                                placeholder="Nhập mô tả đơn vị tính"></textarea>
+                            <label for="symbol">Viết tắt <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="symbol" name="symbol" required
+                                placeholder="Nhập viết tắt">
                         </div>
                         <div id="form-error" class="text-danger small d-none"></div>
                     </div>
@@ -144,19 +130,16 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="edit_code">Mã đơn vị tính <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_code" name="code" required
-                                placeholder="Nhập mã đơn vị tính">
-                        </div>
                         <div class="form-group">
                             <label for="edit_name">Tên đơn vị tính <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="edit_name" name="name" required
                                 placeholder="Nhập tên đơn vị tính">
                         </div>
                         <div class="form-group">
-                            <label for="edit_description">Mô tả</label>
-                            <textarea class="form-control" id="edit_description" name="description" rows="3"
-                                placeholder="Nhập mô tả đơn vị tính"></textarea>
+                            <label for="edit_symbol">Viết tắt <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_symbol" name="symbol" required
+                                    placeholder="Nhập viết tắt">
+                            </div>
                         </div>
                         <div id="edit-form-error" class="text-danger small d-none"></div>
                     </div>
@@ -209,8 +192,7 @@
                 $.get(url, function(data) {
                     $('#edit_id').val(data.id);
                     $('#edit_name').val(data.name);
-                    $('#edit_description').val(data.description);
-                    $('#edit_code').val(data.code);
+                    $('#edit_symbol').val(data.symbol);
                     $('#editunitModal').modal('show');
                 }).fail(() => {
                     toastr.error('Không lấy được dữ liệu đơn vị tính');

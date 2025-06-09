@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -28,8 +28,6 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('serial_number')->nullable();
             $table->enum('status', ['available', 'in_use', 'maintenance', 'broken'])->default('available');
-            $table->boolean('is_fixed')->default(false);
-            $table->unsignedBigInteger('room_id')->nullable();
             $table->unsignedBigInteger('supplier_id')->nullable();
             $table->string('qr_code')->nullable();
             $table->string('qr_token')->unique()->nullable();
@@ -37,7 +35,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('device_id')->references('id')->on('devices')->onDelete('cascade');
-            $table->foreign('room_id')->references('id')->on('rooms')->onDelete('set null');
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
         });
 
@@ -49,8 +46,6 @@ return new class extends Migration
                 'code' => $item->code,
                 'serial_number' => $item->serial_number,
                 'status' => $item->status,
-                'is_fixed' => $item->is_fixed ?? false,
-                'room_id' => $item->room_id,
                 'supplier_id' => $item->supplier_id,
                 'qr_code' => $item->qr_code,
                 'qr_token' => $item->qr_token,

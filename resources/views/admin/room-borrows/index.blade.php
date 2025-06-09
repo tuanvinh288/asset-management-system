@@ -37,7 +37,9 @@
                                         <th>Phòng</th>
                                         <th>Ngày mượn</th>
                                         <th>Ngày trả dự kiến</th>
+                                        <th>Ngày trả thực tế</th>
                                         <th>Trạng thái</th>
+                                        <th>Người duyệt</th>
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
@@ -48,7 +50,19 @@
                                             <td>{{ $roomBorrow->user->name }}</td>
                                             <td>{{ $roomBorrow->room->name }}</td>
                                             <td>{{ $roomBorrow->borrow_date }}</td>
-                                            <td>{{ $roomBorrow->expected_return_date }}</td>
+                                            <td>
+                                                {{ $roomBorrow->return_date }}
+                                                @if($roomBorrow->status == 'returned' && $roomBorrow->actual_return_date > $roomBorrow->return_date)
+                                                    <span class="badge badge-danger">Trả muộn</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($roomBorrow->status == 'returned')
+                                                    {{ $roomBorrow->actual_return_date }}
+                                                @else
+                                                    <span class="text-muted">Chưa trả</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @switch($roomBorrow->status)
                                                     @case('pending')
@@ -66,6 +80,20 @@
                                                 @endswitch
                                             </td>
                                             <td>
+                                                @if($roomBorrow->staff)
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar avatar-sm mr-2">
+                                                            <div class="avatar-title rounded-circle bg-primary">
+                                                                {{ substr($roomBorrow->staff->name, 0, 1) }}
+                                                            </div>
+                                                        </div>
+                                                        <span>{{ $roomBorrow->staff->name }}</span>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">Chưa có</span>
+                                                @endif
+                                            </td>
+                                            <td>
                                                 <a href="{{ route('room-borrows.show', $roomBorrow->id) }}" class="btn btn-info btn-sm">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
@@ -77,7 +105,7 @@
                                                             <i class="fa fa-check"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('room-borrows.reject', $roomBorrow->id) }}" method="POST" style="display: inline;">
+                                                    <form action="{{ route('room-borrows.cancel', $roomBorrow->id) }}" method="POST" style="display: inline;">
                                                         @csrf
                                                         <button type="submit" class="btn btn-danger btn-sm">
                                                             <i class="fa fa-times"></i>
@@ -85,9 +113,17 @@
                                                     </form>
                                                 @endif
                                                 @if($roomBorrow->status == 'approved')
-                                                    <a href="{{ route('room-borrows.return', $roomBorrow->id) }}" class="btn btn-primary btn-sm">
-                                                        <i class="fa fa-undo"></i>
-                                                    </a>
+                                                    <form action="{{ route('room-borrows.return', $roomBorrow->id) }}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                            <i class="fa fa-undo"></i>
+                                                        </button>
+                                                    </form>
+                                                    @if($roomBorrow->return_date > now())
+                                                        <button type="button" class="btn btn-warning btn-sm send-reminder" data-id="{{ $roomBorrow->id }}">
+                                                            <i class="fas fa-bell"></i>Thông báo
+                                                        </button>
+                                                    @endif
                                                 @endif
                                                 @endrole
                                             </td>
@@ -106,4 +142,42 @@
         </div>
     </div>
 </div>
+@endsection
+@section('js')
+<script>
+$(document).ready(function() {
+    // Xử lý gửi thông báo
+    $('.send-reminder').click(function() {
+        debugger;
+        const button = $(this);
+        const borrowId = button.data('id');
+        
+        // Vô hiệu hóa nút trong khi đang xử lý
+        button.prop('disabled', true);
+        
+        $.ajax({
+            url: `/admin/room-borrows/${borrowId}/send-reminder`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                debugger;
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Có lỗi xảy ra khi gửi thông báo');
+            },
+            complete: function() {
+                // Kích hoạt lại nút sau khi xử lý xong
+                button.prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
 @endsection

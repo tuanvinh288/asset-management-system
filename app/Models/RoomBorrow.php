@@ -15,13 +15,15 @@ class RoomBorrow extends Model
         'staff_id',
         'borrow_date',
         'return_date',
+        'actual_return_date',
         'reason',
         'status'
     ];
 
     protected $casts = [
         'borrow_date' => 'datetime',
-        'return_date' => 'datetime'
+        'return_date' => 'datetime',
+        'actual_return_date' => 'datetime'
     ];
 
     public function getStatusTextAttribute()

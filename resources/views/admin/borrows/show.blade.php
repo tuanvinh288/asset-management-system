@@ -7,7 +7,7 @@
             <div class="col-sm-6 p-md-0">
                 <div class="welcome-text">
                     <h4>Chi tiết phiếu mượn</h4>
-                    <span class="ml-1">Thông tin chi tiết phiếu mượn thiết bị</span>
+                    <span class="ml-1">#{{ $borrow->id }}</span>
                 </div>
             </div>
         </div>
@@ -28,36 +28,46 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="text-label">Ngày mượn</label>
-                                    <p class="form-control-static">{{ $borrow->borrow_date }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="text-label">Ngày trả</label>
-                                    <p class="form-control-static">{{ $borrow->return_date ?? 'Chưa trả' }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
                                     <label class="text-label">Trạng thái</label>
                                     <p class="form-control-static">
                                         @php
-                                            $color = [
-                                                'pending' => 'warning',
-                                                'approved' => 'info',
-                                                'borrowed' => 'primary',
-                                                'returned' => 'success',
-                                                'cancelled' => 'danger'
-                                            ][$borrow->status];
+                                            $statusConfig = [
+                                                'pending' => ['color' => 'warning', 'text' => 'Chờ duyệt'],
+                                                'approved' => ['color' => 'info', 'text' => 'Đã duyệt'],
+                                                'borrowed' => ['color' => 'primary', 'text' => 'Đang mượn'],
+                                                'returned' => ['color' => 'success', 'text' => 'Đã trả'],
+                                                'cancelled' => ['color' => 'danger', 'text' => 'Đã hủy']
+                                            ];
+                                            $status = $statusConfig[$borrow->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
                                         @endphp
-                                        <span class="badge badge-{{ $color }}">{{ ucfirst($borrow->status) }}</span>
+                                        <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
                                     </p>
                                 </div>
                             </div>
+                            
+                        </div>
+
+                        <div class="row">
+                        <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="text-label">Ngày mượn</label>
+                                    <p class="form-control-static">{{ $borrow->borrow_date->format('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="text-label">Ngày trả dự kiến</label>
+                                    <p class="form-control-static">{{ $borrow->return_date ? $borrow->return_date->format('d/m/Y H:i') : 'Chưa trả' }}</p>
+                                </div>
+                            </div>
+                            @if($borrow->status === 'returned')
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="text-label">Ngày trả thực tế</label>
+                                    <p class="form-control-static">{{ $borrow->updated_at ? $borrow->updated_at->format('d/m/Y H:i') : 'Chưa trả' }}</p>
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="form-group">
@@ -76,17 +86,38 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="text-label">Trạng thái thiết bị trước khi mượn</label>
-                                    <p class="form-control-static">{{ ucfirst($borrow->device_status_before) }}</p>
+                                    <p class="form-control-static">
+                                        @php
+                                            $statusConfig = [
+                                                'new' => ['color' => 'success', 'text' => 'Mới'],
+                                                'good' => ['color' => 'info', 'text' => 'Tốt'],
+                                                'normal' => ['color' => 'warning', 'text' => 'Bình thường'],
+                                                'damaged' => ['color' => 'danger', 'text' => 'Hỏng']
+                                            ];
+                                            $status = $statusConfig[$borrow->device_status_before] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                        @endphp
+                                        <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
+                                    </p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="text-label">Trạng thái thiết bị sau khi trả</label>
-                                    <p class="form-control-static">{{ $borrow->device_status_after ? ucfirst($borrow->device_status_after) : 'Chưa trả' }}</p>
+                                    <p class="form-control-static">
+                                        @if($borrow->device_status_after)
+                                            @php
+                                                $status = $statusConfig[$borrow->device_status_after] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                            @endphp
+                                            <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
+                                        @else
+                                            <span class="badge badge-secondary">Chưa trả</span>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>
-
+                        <div class="row">
+                        <div class="col-md-6">
                         @if($borrow->device_image_before)
                         <div class="form-group">
                             <label class="text-label">Ảnh thiết bị trước khi mượn</label>
@@ -95,6 +126,8 @@
                             </div>
                         </div>
                         @endif
+                        </div>
+                        <div class="col-md-6">
 
                         @if($borrow->device_image_after)
                         <div class="form-group">
@@ -104,6 +137,8 @@
                             </div>
                         </div>
                         @endif
+                        </div>
+                        </div>
 
                         <div class="form-group">
                             <label class="text-label">Danh sách thiết bị mượn</label>
@@ -122,20 +157,10 @@
                                             <td>{{ $detail->deviceItem->code }}</td>
                                             <td>{{ $detail->deviceItem->serial_number }}</td>
                                             <td>
-                                                @switch($detail->deviceItem->status)
-                                                    @case('available')
-                                                        <span class="badge badge-success">Có sẵn</span>
-                                                        @break
-                                                    @case('borrowed')
-                                                        <span class="badge badge-warning">Đang mượn</span>
-                                                        @break
-                                                    @case('damaged')
-                                                        <span class="badge badge-danger">Hỏng</span>
-                                                        @break
-                                                    @case('maintenance')
-                                                        <span class="badge badge-info">Bảo trì</span>
-                                                        @break
-                                                @endswitch
+                                                @php
+                                                    $status = $statusConfig[$detail->deviceItem->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                                @endphp
+                                                <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -145,20 +170,25 @@
                         </div>
 
                         <div class="form-group">
-                            <a href="{{ route('device-borrows.index') }}" class="btn btn-secondary">Quay lại</a>
                             @if($borrow->status === 'pending')
                                 <form method="POST" action="{{ route('device-borrows.approve', $borrow->id) }}" style="display:inline;">
                                     @csrf
-                                    <button class="btn btn-success">Duyệt</button>
+                                    <button class="btn btn-success">
+                                        <i class="fa fa-check"></i> Duyệt
+                                    </button>
                                 </form>
                                 <form method="POST" action="{{ route('device-borrows.cancel', $borrow->id) }}" style="display:inline;">
                                     @csrf
-                                    <button class="btn btn-danger">Hủy</button>
+                                    <button class="btn btn-danger">
+                                        <i class="fa fa-times"></i> Hủy
+                                    </button>
                                 </form>
                             @elseif($borrow->status === 'approved')
                                 <form method="POST" action="{{ route('device-borrows.return', $borrow->id) }}" style="display:inline;">
                                     @csrf
-                                    <button class="btn btn-secondary">Trả thiết bị</button>
+                                    <button class="btn btn-primary">
+                                        <i class="fa fa-undo"></i> Trả thiết bị
+                                    </button>
                                 </form>
                             @endif
                         </div>

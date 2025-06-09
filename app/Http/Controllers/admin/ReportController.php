@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\DeviceItem;
+use PDF;
 use App\Models\Department;
+use App\Models\DeviceItem;
 use App\Models\Maintenance;
 use Illuminate\Http\Request;
 use App\Exports\DeviceItemsExport;
+use App\Http\Controllers\Controller;
 use App\Exports\MaintenanceCostsExport;
-use Maatwebsite\Excel\Facades\Excel as ExcelFacade;
-use PDF;
 use Spatie\SimpleExcel\SimpleExcelWriter;
+use Maatwebsite\Excel\Facades\Excel as ExcelFacade;
 
 class ReportController extends Controller
 {
@@ -35,9 +35,10 @@ class ReportController extends Controller
         if ($deviceItems->isEmpty()) {
             $statusCounts = collect([
                 'available' => 0,
-                'borrowed' => 0,
+                'pending' => 0,
+                'in_use' => 0,
                 'maintenance' => 0,
-                'damaged' => 0
+                'broken' => 0
             ]);
             $total = 0;
         } else {
@@ -58,18 +59,20 @@ class ReportController extends Controller
     {
         $deviceItems = DeviceItem::all();
         $statusLabels = [
-            'available' => 'Sẵn sàng',
-            'borrowed' => 'Đang mượn',
-            'maintenance' => 'Đang bảo trì',
-            'damaged' => 'Hỏng'
+            'available' => 'Có sẵn',
+            'pending' => 'Đang chờ',
+            'in_use' => 'Đang sử dụng',
+            'maintenance' => 'Bảo trì',
+            'broken' => 'Hỏng'
         ];
         
         if ($deviceItems->isEmpty()) {
             $statusCounts = collect([
                 'available' => 0,
-                'borrowed' => 0,
+                'pending' => 0,
+                'in_use' => 0,
                 'maintenance' => 0,
-                'damaged' => 0
+                'broken' => 0
             ]);
             $total = 0;
         } else {

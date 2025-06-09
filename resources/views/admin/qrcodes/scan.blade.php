@@ -31,22 +31,25 @@
                                     <tr>
                                         <th>Trạng thái:</th>
                                         <td>
-                                            @switch($deviceItem->status)
-                                                @case('available')
-                                                    <span class="badge badge-success">Sẵn sàng</span>
-                                                    @break
-                                                @case('borrowed')
-                                                    <span class="badge badge-warning">Đang mượn</span>
-                                                    @break
-                                                @case('maintenance')
-                                                    <span class="badge badge-info">Đang bảo trì</span>
-                                                    @break
-                                                @case('damaged')
-                                                    <span class="badge badge-danger">Hỏng</span>
-                                                    @break
-                                                @default
-                                                    <span class="badge badge-secondary">{{ $deviceItem->status }}</span>
-                                            @endswitch
+                                            <span class="badge badge-{{ 
+                                                match($deviceItem->status) {
+                                                    'available' => 'success',
+                                                    'pending' => 'warning',
+                                                    'in_use' => 'info',
+                                                    'maintenance' => 'primary',
+                                                    'broken' => 'danger',
+                                                    default => 'secondary'
+                                                }
+                                            }}">
+                                                {{ match($deviceItem->status) {
+                                                    'available' => 'Có sẵn',
+                                                    'pending' => 'Đang chờ',
+                                                    'in_use' => 'Đang sử dụng',
+                                                    'maintenance' => 'Bảo trì',
+                                                    'broken' => 'Hỏng',
+                                                    default => $deviceItem->status
+                                                }}}
+                                            </span>
                                         </td>
                                     </tr>
                                 </table>
@@ -59,10 +62,11 @@
                                         <div class="form-group">
                                             <label>Trạng thái mới</label>
                                             <select name="status" class="form-control" required>
-                                                <option value="available" {{ $deviceItem->status == 'available' ? 'selected' : '' }}>Sẵn sàng</option>
-                                                <option value="borrowed" {{ $deviceItem->status == 'borrowed' ? 'selected' : '' }}>Đang mượn</option>
+                                                <option value="available" {{ $deviceItem->status == 'available' ? 'selected' : '' }}>Có sẵn</option>
+                                                <option value="pending" {{ $deviceItem->status == 'pending' ? 'selected' : '' }}>Đang chờ</option>
+                                                <option value="in_use" {{ $deviceItem->status == 'in_use' ? 'selected' : '' }}>Đang sử dụng</option>
                                                 <option value="maintenance" {{ $deviceItem->status == 'maintenance' ? 'selected' : '' }}>Bảo trì</option>
-                                                <option value="damaged" {{ $deviceItem->status == 'damaged' ? 'selected' : '' }}>Hỏng</option>
+                                                <option value="broken" {{ $deviceItem->status == 'broken' ? 'selected' : '' }}>Hỏng</option>
                                             </select>
                                         </div>
                                         <div class="form-group">

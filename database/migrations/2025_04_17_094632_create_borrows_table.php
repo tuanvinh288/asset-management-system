@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -23,8 +23,9 @@ return new class extends Migration
             $table->enum('device_status_before', ['new', 'good', 'normal', 'damaged'])->nullable(); // Trạng thái thiết bị trước khi mượn
             $table->string('device_image_before')->nullable(); // Ảnh thiết bị trước khi mượn
             $table->enum('status', ['pending', 'approved', 'borrowed', 'returned'])->default('pending');
+            $table->enum('device_status_after', ['new', 'good', 'normal', 'damaged'])->nullable(); // Trạng thái thiết bị sau khi trả
+            $table->string('device_image_after')->nullable(); // Ảnh thiết bị sau khi trả
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('staff_id')->references('id')->on('users');
         });

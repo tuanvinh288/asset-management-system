@@ -50,15 +50,18 @@
                                                 <td>
                                                     @switch($status)
                                                         @case('available')
-                                                            <span class="badge badge-success">Sẵn sàng</span>
+                                                            <span class="badge badge-success">Có sẵn</span>
                                                             @break
-                                                        @case('borrowed')
-                                                            <span class="badge badge-warning">Đang mượn</span>
+                                                        @case('pending')
+                                                            <span class="badge badge-warning">Đang chờ</span>
+                                                            @break
+                                                        @case('in_use')
+                                                            <span class="badge badge-info">Đang sử dụng</span>
                                                             @break
                                                         @case('maintenance')
-                                                            <span class="badge badge-info">Bảo trì</span>
+                                                            <span class="badge badge-primary">Bảo trì</span>
                                                             @break
-                                                        @case('damaged')
+                                                        @case('broken')
                                                             <span class="badge badge-danger">Hỏng</span>
                                                             @break
                                                         @default
@@ -92,10 +95,11 @@
 
         const labels = Object.keys(statusData).map(status => {
             switch(status) {
-                case 'available': return 'Sẵn sàng';
-                case 'borrowed': return 'Đang mượn';
+                case 'available': return 'Có sẵn';
+                case 'pending': return 'Đang chờ';
+                case 'in_use': return 'Đang sử dụng';
                 case 'maintenance': return 'Bảo trì';
-                case 'damaged': return 'Hỏng';
+                case 'broken': return 'Hỏng';
                 default: return status;
             }
         });
@@ -105,10 +109,11 @@
             datasets: [{
                 data: Object.values(deviceCounts),
                 backgroundColor: [
-                    '#28a745', // Success
-                    '#ffc107', // Warning
-                    '#17a2b8', // Info
-                    '#dc3545'  // Danger
+                    '#28a745', // Success - Có sẵn
+                    '#ffc107', // Warning - Đang chờ
+                    '#17a2b8', // Info - Đang sử dụng
+                    '#007bff', // Primary - Bảo trì
+                    '#dc3545'  // Danger - Hỏng
                 ],
                 borderWidth: 1
             }]

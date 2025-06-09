@@ -64,6 +64,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label class="text-label">Đơn vị tính</label>
+                                <select name="unit_id" class="form-control" required>
+                                    <option value="">-- Chọn đơn vị tính --</option>
+                                    @foreach($units as $unit)
+                                        <option value="{{ $unit->id }}" {{ old('unit_id', $device->unit_id) == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <div class="form-group">
                                 <label class="text-label">Mô tả</label>

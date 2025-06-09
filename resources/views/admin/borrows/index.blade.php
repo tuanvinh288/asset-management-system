@@ -38,7 +38,9 @@
                                             <th>Người mượn</th>
                                             <th>Ngày mượn</th>
                                             <th>Ngày trả dự kiến</th>
+                                            <th>Ngày trả thực tế</th>
                                             <th>Trạng thái</th>
+                                            <th>Người duyệt</th>
                                             <th>Thao tác</th>
                                         </tr>
                                     </thead>
@@ -48,7 +50,19 @@
                                                 <td>{{ $borrow->id }}</td>
                                                 <td>{{ $borrow->user->name }}</td>
                                                 <td>{{ $borrow->borrow_date }}</td>
-                                                <td>{{ $borrow->return_date }}</td>
+                                                <td>
+                                                    {{ $borrow->return_date }}
+                                                    @if($borrow->status == 'returned' && $borrow->actual_return_date > $borrow->return_date)
+                                                        <span class="badge badge-danger">Trả muộn</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($borrow->status == 'returned')
+                                                        {{ $borrow->actual_return_date }}
+                                                    @else
+                                                        <span class="text-muted">Chưa trả</span>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @switch($borrow->status)
                                                         @case('pending')
@@ -66,10 +80,29 @@
                                                     @endswitch
                                                 </td>
                                                 <td>
+                                                    @if($borrow->staff)
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar avatar-sm mr-2">
+                                                                <div class="avatar-title rounded-circle bg-primary">
+                                                                    {{ substr($borrow->staff->name, 0, 1) }}
+                                                                </div>
+                                                            </div>
+                                                            <span>{{ $borrow->staff->name }}</span>
+                                                        </div>
+                                                    @else
+                                                        <span class="text-muted">Chưa có</span>
+                                                    @endif
+                                                </td>
+                                                <td>
                                                     <a href="{{ route('device-borrows.show', $borrow->id) }}" class="btn btn-info btn-sm">
                                                         <i class="fa fa-eye"></i>
                                                     </a>
                                                     @role('admin')
+                                                    @if($borrow->status === 'approved' && $borrow->return_date > now())
+                                                        <button type="button" class="btn btn-warning btn-sm send-reminder" data-id="{{ $borrow->id }}">
+                                                            <i class="fas fa-bell"></i> Gửi thông báo
+                                                        </button>
+                                                    @endif
                                                     @if($borrow->status == 'pending')
                                                         <form action="{{ route('device-borrows.approve', $borrow->id) }}" method="POST" style="display: inline;">
                                                             @csrf
@@ -201,6 +234,38 @@
 @section('js')
 <script>
     $(document).ready(function() {
+    // Xử lý gửi thông báo
+    $('.send-reminder').click(function() {
+        const button = $(this);
+        const borrowId = button.data('id');
+        
+        // Vô hiệu hóa nút trong khi đang xử lý
+        button.prop('disabled', true);
+        
+        $.ajax({
+            url: `/admin/borrows/${borrowId}/send-reminder`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Có lỗi xảy ra khi gửi thông báo');
+            },
+            complete: function() {
+                // Kích hoạt lại nút sau khi xử lý xong
+                button.prop('disabled', false);
+            }
+        });
+    });
+});
+    $(document).ready(function() {        
         // Xử lý sự kiện click vào nút toggle-details
         $('.toggle-details').on('click', function() {
             const borrowId = $(this).data('borrow-id');

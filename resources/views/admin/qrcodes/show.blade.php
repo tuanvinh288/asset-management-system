@@ -45,22 +45,25 @@
                                     <tr>
                                         <th>Trạng thái:</th>
                                         <td>
-                                            @switch($deviceItem->status)
-                                                @case('available')
-                                                    <span class="badge badge-success">Sẵn sàng</span>
-                                                    @break
-                                                @case('borrowed')
-                                                    <span class="badge badge-warning">Đang mượn</span>
-                                                    @break
-                                                @case('maintenance')
-                                                    <span class="badge badge-info">Đang bảo trì</span>
-                                                    @break
-                                                @case('damaged')
-                                                    <span class="badge badge-danger">Hỏng</span>
-                                                    @break
-                                                @default
-                                                    <span class="badge badge-secondary">{{ $deviceItem->status }}</span>
-                                            @endswitch
+                                            <span class="badge badge-{{ 
+                                                match($deviceItem->status) {
+                                                    'available' => 'success',
+                                                    'pending' => 'warning',
+                                                    'in_use' => 'info',
+                                                    'maintenance' => 'primary',
+                                                    'broken' => 'danger',
+                                                    default => 'secondary'
+                                                }
+                                            }}">
+                                                {{ match($deviceItem->status) {
+                                                    'available' => 'Có sẵn',
+                                                    'pending' => 'Đang chờ',
+                                                    'in_use' => 'Đang sử dụng',
+                                                    'maintenance' => 'Bảo trì',
+                                                    'broken' => 'Hỏng',
+                                                    default => $deviceItem->status
+                                                }}}
+                                            </span>
                                         </td>
                                     </tr>
                                     <tr>

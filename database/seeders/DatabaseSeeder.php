@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             DeviceSeeder::class,
             RoomSeeder::class,
+            SupplierSeeder::class,
         ]);
         // User::factory(10)->create();
     }

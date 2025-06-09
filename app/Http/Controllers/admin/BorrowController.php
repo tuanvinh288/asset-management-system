@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Borrow;
-use App\Models\BorrowDetail;
 use App\Models\Device;
 use App\Models\DeviceItem;
+use App\Mail\ReturnReminder;
+use App\Models\BorrowDetail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 
 class BorrowController extends Controller
 {
@@ -152,39 +156,33 @@ class BorrowController extends Controller
         }
     }
 
-    public function markReturned($id)
+    public function markReturned(Request $request, $id)
     {
         DB::beginTransaction();
         try {
-            $borrow = Borrow::with('details.deviceItem')->findOrFail($id);
+            $borrow = Borrow::findOrFail($id);
 
-            // Kiểm tra trạng thái phiếu mượn
             if ($borrow->status !== 'approved') {
                 return back()->with('error', 'Chỉ có thể đánh dấu trả cho phiếu mượn đã được duyệt.');
             }
 
             $borrow->update([
                 'status' => 'returned',
-                'return_date' => now(),
+                'actual_return_date' => now()
             ]);
 
+            // Cập nhật trạng thái các thiết bị
             foreach ($borrow->details as $detail) {
-                // Cập nhật trạng thái thiết bị về available
-                if ($detail->deviceItem && $detail->deviceItem->status === 'pending') {
-                    $detail->deviceItem->update(['status' => 'available']);
-                }
-
-                // Cập nhật ngày trả thực tế cho chi tiết mượn
-                $detail->update([
-                    'actual_return_date' => now()
-                ]);
+                $detail->deviceItem->update(['status' => 'available']);
             }
 
             DB::commit();
-            return redirect()->route('device-borrows.index')->with('success', 'Phiếu mượn đã được đánh dấu là đã trả.');
+            return redirect()->route('device-borrows.show', $borrow->id)
+                ->with('success', 'Thiết bị đã được trả thành công.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Có lỗi xảy ra khi cập nhật trạng thái: ' . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra khi xử lý trả thiết bị: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -259,6 +257,27 @@ class BorrowController extends Controller
     {
         $borrow = Borrow::with(['details.deviceItem'])->findOrFail($id);
         return view('admin.borrows.return', compact('borrow'));
+    }
+
+    public function sendReturnReminder(Borrow $borrow)
+    {
+        try {
+            // Load các relationship cần thiết
+            $borrow->load(['user', 'details.deviceItem.device']);
+            
+            // Gửi email thông báo
+            Mail::to($borrow->user->email)->send(new ReturnReminder($borrow, 'device', false));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã gửi thông báo thành công!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi gửi thông báo: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
 

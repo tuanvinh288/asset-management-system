@@ -53,44 +53,50 @@
                                             </td>
                                             <td>
                                                 @if($scan->old_status)
-                                                    @switch($scan->old_status)
-                                                        @case('available')
-                                                            <span class="badge badge-success">Sẵn sàng</span>
-                                                            @break
-                                                        @case('borrowed')
-                                                            <span class="badge badge-warning">Đang mượn</span>
-                                                            @break
-                                                        @case('maintenance')
-                                                            <span class="badge badge-info">Bảo trì</span>
-                                                            @break
-                                                        @case('damaged')
-                                                            <span class="badge badge-danger">Hỏng</span>
-                                                            @break
-                                                        @default
-                                                            <span class="badge badge-secondary">{{ $scan->old_status }}</span>
-                                                    @endswitch
+                                                    <span class="badge badge-{{ 
+                                                        match($scan->old_status) {
+                                                            'available' => 'success',
+                                                            'pending' => 'warning',
+                                                            'in_use' => 'info',
+                                                            'maintenance' => 'primary',
+                                                            'broken' => 'danger',
+                                                            default => 'secondary'
+                                                        }
+                                                    }}">
+                                                        {{ match($scan->old_status) {
+                                                            'available' => 'Có sẵn',
+                                                            'pending' => 'Đang chờ',
+                                                            'in_use' => 'Đang sử dụng',
+                                                            'maintenance' => 'Bảo trì',
+                                                            'broken' => 'Hỏng',
+                                                            default => $scan->old_status
+                                                        }}}
+                                                    </span>
                                                 @else
                                                     -
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($scan->new_status)
-                                                    @switch($scan->new_status)
-                                                        @case('available')
-                                                            <span class="badge badge-success">Sẵn sàng</span>
-                                                            @break
-                                                        @case('borrowed')
-                                                            <span class="badge badge-warning">Đang mượn</span>
-                                                            @break
-                                                        @case('maintenance')
-                                                            <span class="badge badge-info">Bảo trì</span>
-                                                            @break
-                                                        @case('damaged')
-                                                            <span class="badge badge-danger">Hỏng</span>
-                                                            @break
-                                                        @default
-                                                            <span class="badge badge-secondary">{{ $scan->new_status }}</span>
-                                                    @endswitch
+                                                    <span class="badge badge-{{ 
+                                                        match($scan->new_status) {
+                                                            'available' => 'success',
+                                                            'pending' => 'warning',
+                                                            'in_use' => 'info',
+                                                            'maintenance' => 'primary',
+                                                            'broken' => 'danger',
+                                                            default => 'secondary'
+                                                        }
+                                                    }}">
+                                                        {{ match($scan->new_status) {
+                                                            'available' => 'Có sẵn',
+                                                            'pending' => 'Đang chờ',
+                                                            'in_use' => 'Đang sử dụng',
+                                                            'maintenance' => 'Bảo trì',
+                                                            'broken' => 'Hỏng',
+                                                            default => $scan->new_status
+                                                        }}}
+                                                    </span>
                                                 @else
                                                     -
                                                 @endif

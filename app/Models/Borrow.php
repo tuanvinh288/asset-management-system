@@ -12,16 +12,20 @@ class Borrow extends Model
         'staff_id', 
         'borrow_date', 
         'return_date', 
+        'actual_return_date',
         'status',
         'reason',
         'note',
         'device_status_before',
-        'device_image_before'
+        'device_image_before',
+        'device_status_after',
+        'device_image_after'
     ];
 
     protected $casts = [
-        'borrow_date' => 'date',
-        'return_date' => 'date',
+        'borrow_date' => 'datetime',
+        'return_date' => 'datetime',
+        'actual_return_date' => 'datetime'
     ];
 
     public function getStatusTextAttribute()

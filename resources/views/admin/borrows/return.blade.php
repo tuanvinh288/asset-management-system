@@ -77,23 +77,16 @@
                                                     <td>{{ $item->code }}</td>
                                                     <td>{{ $item->serial_number }}</td>
                                                     <td>
-                                                        @switch($item->status)
-                                                            @case('available')
-                                                                <span class="badge badge-success">Có sẵn</span>
-                                                                @break
-                                                            @case('pending')
-                                                                <span class="badge badge-warning">Chờ duyệt</span>
-                                                                @break
-                                                            @case('in_use')
-                                                                <span class="badge badge-primary">Đang mượn</span>
-                                                                @break
-                                                            @case('damaged')
-                                                                <span class="badge badge-danger">Hỏng</span>
-                                                                @break
-                                                            @case('maintenance')
-                                                                <span class="badge badge-info">Bảo trì</span>
-                                                                @break
-                                                        @endswitch
+                                                        @php
+                                                            $statusConfig = [
+                                                                'new' => ['color' => 'success', 'text' => 'Mới'],
+                                                                'good' => ['color' => 'info', 'text' => 'Tốt'],
+                                                                'normal' => ['color' => 'warning', 'text' => 'Bình thường'],
+                                                                'damaged' => ['color' => 'danger', 'text' => 'Hỏng']
+                                                            ];
+                                                            $status = $statusConfig[$item->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                                        @endphp
+                                                        <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
                                                     </td>
                                                 </tr>
                                                 @endif
