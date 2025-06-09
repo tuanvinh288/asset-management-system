@@ -104,7 +104,6 @@ class DeviceSeeder extends Seeder
                     'device_id' => $device->id,
                     'code' => 'DEV-' . $device->id . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
                     'status' => $faker->randomElement(['available', 'in_use', 'maintenance', 'broken']),
-                    'is_fixed' => isset($deviceData['is_fixed']) ? $deviceData['is_fixed'] : false
                 ]);
             }
         }
