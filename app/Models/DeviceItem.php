@@ -61,6 +61,11 @@ class DeviceItem extends Model
         return $this->hasMany(QrScan::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
+
     // Tạo QR code cho thiết bị
     public function generateQrCode()
     {

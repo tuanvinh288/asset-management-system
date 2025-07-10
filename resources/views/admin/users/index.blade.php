@@ -18,6 +18,41 @@
             </div>
         </div>
 
+        <!-- Nút mở modal import -->
+        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#importModal">
+            <i class="fa fa-file-excel-o"></i> Import Excel
+        </button>
+
+        <!-- Modal Import Excel -->
+        <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Giảng viên từ Excel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label for="file">Chọn file Excel (.xlsx, .xls)</label>
+                    <input type="file" name="file" class="form-control" required accept=".xlsx,.xls">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="/admin/template_excel/import_excel.xlsx" class="btn btn-info" download>
+                    <i class="fa fa-download"></i> Tải file mẫu
+                  </a>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                  <button type="submit" class="btn btn-success">Import Excel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <!-- Danh sách tài khoản -->
         <div class="row">
             <div class="col-12">
@@ -73,6 +108,11 @@
                                                 <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">
                                                     <i class="fa fa-edit"></i> Sửa
                                                 </a>
+                                                @if($user->hasRole('teacher'))
+                                                    <a href="{{ route('users.assignedDevices', $user->id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fa fa-laptop"></i> Thiết bị đã cấp
+                                                    </a>
+                                                @endif
                                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')

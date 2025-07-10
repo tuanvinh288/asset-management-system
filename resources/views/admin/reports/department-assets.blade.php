@@ -30,51 +30,39 @@
                         </div>
                         <div class="card-body">
                             @foreach($departments as $department)
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h4>{{ $department->name }}</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Mã thiết bị</th>
-                                                    <th>Tên thiết bị</th>
-                                                    <th>Trạng thái</th>
-                                                    <th>Ngày mua</th>
-                                                    <th>Giá trị</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($department->deviceItems as $item)
-                                                <tr>
-                                                    <td>{{ $item->code }}</td>
-                                                    <td>{{ $item->device->name }}</td>
-                                                    <td>
-                                                        @if($item->status == 'available')
-                                                            <span class="badge badge-success">Có sẵn</span>
-                                                        @elseif($item->status == 'in_use')
-                                                            <span class="badge badge-info">Đang sử dụng</span>
-                                                        @elseif($item->status == 'maintenance')
-                                                            <span class="badge badge-warning">Đang bảo trì</span>
-                                                        @elseif($item->status == 'broken')
-                                                            <span class="badge badge-danger">Hỏng</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $item->purchase_date }}</td>
-                                                    <td>{{ number_format($item->value) }} VNĐ</td>
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="5" class="text-center">Không có thiết bị nào</td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h4>{{ $department->name }}</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Tên phòng</th>
+                                                        <th>Mã phòng</th>
+                                                        <th>Ghi chú</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse($department->rooms as $i => $room)
+                                                    <tr>
+                                                        <td>{{ $i + 1 }}</td>
+                                                        <td>{{ $room->name }}</td>
+                                                        <td>{{ $room->code }}</td>
+                                                        <td>{{ $room->note }}</td>
+                                                    </tr>
+                                                    @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">Không có phòng nào</td>
+                                                    </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             @endforeach
                         </div>
                     </div>

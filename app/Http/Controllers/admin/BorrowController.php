@@ -35,7 +35,7 @@ class BorrowController extends Controller
     public function create()
     {
         $devices = Device::all();
-        $deviceItems = DeviceItem::where('status', 'available')->get();
+        $deviceItems = DeviceItem::where('status', 'available')->whereNull('user_id')->get();
         return view('admin.borrows.create', compact('deviceItems', 'devices'));
     }
 
@@ -158,6 +158,13 @@ class BorrowController extends Controller
 
     public function markReturned(Request $request, $id)
     {
+        $request->validate([
+            'return_date' => 'required|date',
+            'device_status_after' => 'required|in:new,good,normal,damaged',
+            'device_image_after' => 'nullable|image|max:2048',
+            'note' => 'nullable|string|max:1000'
+        ]);
+
         DB::beginTransaction();
         try {
             $borrow = Borrow::findOrFail($id);
@@ -166,14 +173,26 @@ class BorrowController extends Controller
                 return back()->with('error', 'Chỉ có thể đánh dấu trả cho phiếu mượn đã được duyệt.');
             }
 
+            // Xử lý upload ảnh nếu có
+            $imagePath = null;
+            if ($request->hasFile('device_image_after')) {
+                $imagePath = $request->file('device_image_after')->store('device-returns', 'public');
+            }
+
+            // Cập nhật thông tin phiếu mượn
             $borrow->update([
                 'status' => 'returned',
-                'actual_return_date' => now()
+                'actual_return_date' => $request->return_date,
+                'return_note' => $request->note,
+                'return_image' => $imagePath
             ]);
 
             // Cập nhật trạng thái các thiết bị
             foreach ($borrow->details as $detail) {
-                $detail->deviceItem->update(['status' => 'available']);
+                $detail->deviceItem->update([
+                    'status' => 'available',
+                    'condition' => $request->device_status_after
+                ]);
             }
 
             DB::commit();
@@ -264,7 +283,7 @@ class BorrowController extends Controller
         try {
             // Load các relationship cần thiết
             $borrow->load(['user', 'details.deviceItem.device']);
-            
+
             // Gửi email thông báo
             Mail::to($borrow->user->email)->send(new ReturnReminder($borrow, 'device', false));
 

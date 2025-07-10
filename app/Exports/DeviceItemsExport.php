@@ -9,38 +9,46 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class DeviceItemsExport implements FromCollection, WithHeadings, WithMapping
 {
+    protected $rows;
+
     public function collection()
     {
-        return Department::with(['deviceItems' => function($query) {
-            $query->with('device');
-        }])->get();
+        // Lấy tất cả phòng ban, kèm khoa và phòng
+        $departments = Department::with(['rooms'])->get();
+        $this->rows = collect();
+        foreach ($departments as $department) {
+            foreach ($department->rooms as $room) {
+                $this->rows->push([
+                    $department->name,
+                    $room->name,
+                    $room->code,
+                    $room->note
+                ]);
+            }
+            // Nếu phòng ban không có phòng, vẫn xuất 1 dòng
+            if ($department->rooms->isEmpty()) {
+                $this->rows->push([
+                    $department->name,
+                    '', '', ''
+                ]);
+            }
+        }
+        return $this->rows;
     }
 
     public function headings(): array
     {
         return [
-            'Phòng ban',
-            'Mã thiết bị',
-            'Tên thiết bị',
-            'Trạng thái',
-            'Ngày mua',
-            'Giá trị'
+            'Tên khoa',
+            'Tên phòng',
+            'Mã phòng',
+            'Ghi chú'
         ];
     }
 
-    public function map($department): array
+    public function map($row): array
     {
-        $rows = [];
-        foreach ($department->deviceItems as $item) {
-            $rows[] = [
-                $department->name,
-                $item->code,
-                $item->device->name,
-                $item->status,
-                $item->purchase_date,
-                $item->value
-            ];
-        }
-        return $rows;
+        // $row đã là mảng đúng thứ tự
+        return $row;
     }
-} 
+}

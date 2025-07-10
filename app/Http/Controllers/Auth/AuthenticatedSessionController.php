@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Kiểm tra đăng nhập lần đầu
+        if (auth()->user()->first_login) {
+            return redirect()->route('first-password.change');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

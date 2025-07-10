@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Mail\UserAccountInfoMail;
+use Illuminate\Support\Facades\Mail;
+use App\Models\DeviceItem;
 
 class UserController extends Controller
 {
@@ -33,12 +39,16 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'department_id' => $request->department_id,
-        ])->assignRole($request->role_id);
+        ]);
+        $user->assignRole($request->role_id);
+
+        // Gửi mail thông tin tài khoản
+        Mail::to($user->email)->send(new UserAccountInfoMail($user, $request->password));
 
         return redirect()->route('users.index');
     }
@@ -78,5 +88,87 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index');
+    }
+
+    // Import giảng viên từ file Excel
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls'
+        ]);
+
+        $file = $request->file('file');
+        $data = Excel::toArray([], $file);
+
+        // Sheet đầu tiên
+        $rows = $data[0];
+        unset($rows[0]); // Bỏ dòng tiêu đề
+
+        foreach ($rows as $row) {
+            $name = trim($row[1] ?? '');
+            $departmentName = trim($row[2] ?? '');
+            if (!$name) continue;
+
+            $department_id = null;
+            if ($departmentName) {
+                $department = Department::firstOrCreate(['name' => $departmentName]);
+                $department_id = $department->id;
+            }
+
+            $email = Str::slug($name, '.') . '@example.com';
+            $i = 1;
+            $baseEmail = $email;
+            while (User::where('email', $email)->exists()) {
+                $email = Str::slug($name, '.') . $i . '@example.com';
+                $i++;
+            }
+
+            $password = '123456';
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'password' => Hash::make($password),
+                'department_id' => $department_id,
+            ]);
+
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('teacher');
+            } else {
+                $user->roles()->attach(2);
+            }
+
+            // Gửi mail thông tin tài khoản
+            Mail::to($user->email)->send(new UserAccountInfoMail($user, $password));
+        }
+
+        return back()->with('success', 'Import thành công!');
+    }
+
+    // Hiển thị form đổi mật khẩu lần đầu
+    public function showFirstPasswordForm()
+    {
+        return view('auth.first_password_change');
+    }
+
+    // Xử lý đổi mật khẩu lần đầu
+    public function updateFirstPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+        $user = auth()->user();
+        $user->password = bcrypt($request->password);
+        $user->first_login = false;
+        $user->save();
+        return redirect()->route('dashboard')->with('success', 'Đổi mật khẩu thành công!');
+    }
+
+
+
+    public function show($id)
+    {
+        $user = User::with(['department', 'assignedDevices'])->findOrFail($id);
+        $deviceItems = DeviceItem::whereNull('user_id')->where('status', 'available')->get();
+        return view('admin.users.show', compact('user', 'deviceItems'));
     }
 }

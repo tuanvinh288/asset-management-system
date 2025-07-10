@@ -20,11 +20,11 @@
                         <div class="card-header">
                             <h4 class="card-title">Danh sách mượn thiết bị</h4>
                             @role('admin')
-                            <a href="{{ route('device-borrows.create') }}" class="btn btn-primary">Đăng ký mượn mới</a>
+                                <a href="{{ route('device-borrows.create') }}" class="btn btn-primary">Đăng ký mượn mới</a>
                             @endrole
                         </div>
                         <div class="card-body">
-                            @if(session('success'))
+                            @if (session('success'))
                                 <div class="alert alert-success">
                                     {{ session('success') }}
                                 </div>
@@ -52,12 +52,12 @@
                                                 <td>{{ $borrow->borrow_date }}</td>
                                                 <td>
                                                     {{ $borrow->return_date }}
-                                                    @if($borrow->status == 'returned' && $borrow->actual_return_date > $borrow->return_date)
+                                                    @if ($borrow->status == 'returned' && $borrow->actual_return_date > $borrow->return_date)
                                                         <span class="badge badge-danger">Trả muộn</span>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if($borrow->status == 'returned')
+                                                    @if ($borrow->status == 'returned')
                                                         {{ $borrow->actual_return_date }}
                                                     @else
                                                         <span class="text-muted">Chưa trả</span>
@@ -67,20 +67,23 @@
                                                     @switch($borrow->status)
                                                         @case('pending')
                                                             <span class="badge badge-warning">Chờ duyệt</span>
-                                                            @break
+                                                        @break
+
                                                         @case('approved')
                                                             <span class="badge badge-success">Đã duyệt</span>
-                                                            @break
+                                                        @break
+
                                                         @case('rejected')
                                                             <span class="badge badge-danger">Từ chối</span>
-                                                            @break
+                                                        @break
+
                                                         @case('returned')
                                                             <span class="badge badge-info">Đã trả</span>
-                                                            @break
+                                                        @break
                                                     @endswitch
                                                 </td>
                                                 <td>
-                                                    @if($borrow->staff)
+                                                    @if ($borrow->staff)
                                                         <div class="d-flex align-items-center">
                                                             <div class="avatar avatar-sm mr-2">
                                                                 <div class="avatar-title rounded-circle bg-primary">
@@ -94,234 +97,243 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('device-borrows.show', $borrow->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('device-borrows.show', $borrow->id) }}"
+                                                        class="btn btn-info btn-sm">
                                                         <i class="fa fa-eye"></i>
                                                     </a>
                                                     @role('admin')
-                                                    @if($borrow->status === 'approved' && $borrow->return_date > now())
-                                                        <button type="button" class="btn btn-warning btn-sm send-reminder" data-id="{{ $borrow->id }}">
-                                                            <i class="fas fa-bell"></i> Gửi thông báo
-                                                        </button>
-                                                    @endif
-                                                    @if($borrow->status == 'pending')
-                                                        <form action="{{ route('device-borrows.approve', $borrow->id) }}" method="POST" style="display: inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm">
-                                                                <i class="fa fa-check"></i>
+                                                        @if ($borrow->status === 'approved' && $borrow->return_date > now())
+                                                            <button type="button" class="btn btn-warning btn-sm send-reminder"
+                                                                data-id="{{ $borrow->id }}">
+                                                                <i class="fas fa-bell"></i> Gửi thông báo
                                                             </button>
-                                                        </form>
-                                                        <form action="{{ route('device-borrows.cancel', $borrow->id) }}" method="POST" style="display: inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                    @if($borrow->status == 'approved')
-                                                        <a href="{{ route('device-borrows.return', $borrow->id) }}" class="btn btn-primary btn-sm">
-                                                            <i class="fa fa-undo"></i>
-                                                        </a>
-                                                    @endif
-                                                    @endrole
-                                                </td>
+                                                        @endif
+                                                        @if ($borrow->status == 'pending')
+                                                            @role('admin')
+                                                                <form action="{{ route('device-borrows.approve', $borrow->id) }}"
+                                                                    method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                                        <i class="fa fa-check"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                            <form action="{{ route('device-borrows.cancel', $borrow->id) }}"
+                                                                method="POST" style="display: inline;">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                @endif
+                                                @if ($borrow->status == 'approved')
+                                                    <a href="{{ route('device-borrows.return', $borrow->id) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        <i class="fa fa-undo"></i>
+                                                    </a>
+                                                @endif
+                                            @endrole
+                                            </td>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" class="text-center">Không có dữ liệu</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center">Không có dữ liệu</td>
+                                                </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <style>
-        .avatar {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar-sm {
-            width: 24px;
-            height: 24px;
-            font-size: 12px;
-        }
-
-        .avatar-title {
-            width: 100%;
-            height: 100%;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .badge-pill {
-            font-size: 12px;
-        }
-
-        .btn-group .btn {
-            padding: 0.375rem 0.75rem;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .fa-chevron-down {
-            font-size: 12px;
-            color: #666;
-            transition: transform 0.2s;
-        }
-
-        .rotate-icon {
-            transform: rotate(180deg);
-        }
-
-        .details-row {
-            background: none !important;
-        }
-
-        .details-row:hover {
-            background: none !important;
-        }
-
-        .borrow-details-row {
-            position: relative;
-            width: 100%;
-            background: none !important;
-        }
-
-        .borrow-details-wrapper {
-            margin: 0;
-            width: 100%;
-            background: white;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .borrow-details {
-            padding: 15px 30px;
-            background-color: #f8f9fa;
-            border-left: 1px solid #e5e5e5;
-            border-right: 1px solid #e5e5e5;
-            margin: 0 -1px; /* Để border khớp với table */
-        }
-
-        /* Đảm bảo chi tiết nằm đúng vị trí sau mỗi dòng */
-        #example tbody tr {
-            position: relative;
-        }
-
-        /* Fix DataTable styling conflicts */
-        .dataTables_wrapper .borrow-details-row {
-            background: none !important;
-        }
-
-        .dataTables_wrapper .borrow-details-row:hover {
-            background: none !important;
-        }
-    </style>
-@endsection
-
-@section('js')
-<script>
-    $(document).ready(function() {
-    // Xử lý gửi thông báo
-    $('.send-reminder').click(function() {
-        const button = $(this);
-        const borrowId = button.data('id');
-        
-        // Vô hiệu hóa nút trong khi đang xử lý
-        button.prop('disabled', true);
-        
-        $.ajax({
-            url: `/admin/borrows/${borrowId}/send-reminder`,
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.success) {
-                    toastr.success(response.message);
-                } else {
-                    toastr.error(response.message);
+            <style>
+                .avatar {
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
-            },
-            error: function(xhr) {
-                toastr.error('Có lỗi xảy ra khi gửi thông báo');
-            },
-            complete: function() {
-                // Kích hoạt lại nút sau khi xử lý xong
-                button.prop('disabled', false);
-            }
-        });
-    });
-});
-    $(document).ready(function() {        
-        // Xử lý sự kiện click vào nút toggle-details
-        $('.toggle-details').on('click', function() {
-            const borrowId = $(this).data('borrow-id');
-            const icon = $(this).find('i');
-            const detailsRow = $(`.borrow-details-row[data-parent-row-id="${borrowId}"]`);
-            const detailsWrapper = detailsRow.find('.borrow-details-wrapper');
-            const detailsContainer = detailsWrapper.find('.borrow-details');
 
-            // Toggle icon
-            icon.toggleClass('rotate-icon');
+                .avatar-sm {
+                    width: 24px;
+                    height: 24px;
+                    font-size: 12px;
+                }
 
-            // Nếu đã có nội dung, chỉ cần toggle hiển thị
-            if (detailsContainer.children().length > 0) {
-                detailsWrapper.slideToggle();
-                return;
-            }
+                .avatar-title {
+                    width: 100%;
+                    height: 100%;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
 
-            // Hiển thị loading
-            detailsContainer.html(`
+                .badge-pill {
+                    font-size: 12px;
+                }
+
+                .btn-group .btn {
+                    padding: 0.375rem 0.75rem;
+                }
+
+                .table td {
+                    vertical-align: middle;
+                }
+
+                .fa-chevron-down {
+                    font-size: 12px;
+                    color: #666;
+                    transition: transform 0.2s;
+                }
+
+                .rotate-icon {
+                    transform: rotate(180deg);
+                }
+
+                .details-row {
+                    background: none !important;
+                }
+
+                .details-row:hover {
+                    background: none !important;
+                }
+
+                .borrow-details-row {
+                    position: relative;
+                    width: 100%;
+                    background: none !important;
+                }
+
+                .borrow-details-wrapper {
+                    margin: 0;
+                    width: 100%;
+                    background: white;
+                    border-bottom: 1px solid #e5e5e5;
+                }
+
+                .borrow-details {
+                    padding: 15px 30px;
+                    background-color: #f8f9fa;
+                    border-left: 1px solid #e5e5e5;
+                    border-right: 1px solid #e5e5e5;
+                    margin: 0 -1px;
+                    /* Để border khớp với table */
+                }
+
+                /* Đảm bảo chi tiết nằm đúng vị trí sau mỗi dòng */
+                #example tbody tr {
+                    position: relative;
+                }
+
+                /* Fix DataTable styling conflicts */
+                .dataTables_wrapper .borrow-details-row {
+                    background: none !important;
+                }
+
+                .dataTables_wrapper .borrow-details-row:hover {
+                    background: none !important;
+                }
+            </style>
+        @endsection
+
+        @section('js')
+            <script>
+                $(document).ready(function() {
+                    // Xử lý gửi thông báo
+                    $('.send-reminder').click(function() {
+                        const button = $(this);
+                        const borrowId = button.data('id');
+
+                        // Vô hiệu hóa nút trong khi đang xử lý
+                        button.prop('disabled', true);
+
+                        $.ajax({
+                            url: `/admin/borrows/${borrowId}/send-reminder`,
+                            method: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    toastr.success(response.message);
+                                } else {
+                                    toastr.error(response.message);
+                                }
+                            },
+                            error: function(xhr) {
+                                toastr.error('Có lỗi xảy ra khi gửi thông báo');
+                            },
+                            complete: function() {
+                                // Kích hoạt lại nút sau khi xử lý xong
+                                button.prop('disabled', false);
+                            }
+                        });
+                    });
+                });
+                $(document).ready(function() {
+                    // Xử lý sự kiện click vào nút toggle-details
+                    $('.toggle-details').on('click', function() {
+                        const borrowId = $(this).data('borrow-id');
+                        const icon = $(this).find('i');
+                        const detailsRow = $(`.borrow-details-row[data-parent-row-id="${borrowId}"]`);
+                        const detailsWrapper = detailsRow.find('.borrow-details-wrapper');
+                        const detailsContainer = detailsWrapper.find('.borrow-details');
+
+                        // Toggle icon
+                        icon.toggleClass('rotate-icon');
+
+                        // Nếu đã có nội dung, chỉ cần toggle hiển thị
+                        if (detailsContainer.children().length > 0) {
+                            detailsWrapper.slideToggle();
+                            return;
+                        }
+
+                        // Hiển thị loading
+                        detailsContainer.html(`
                 <div class="text-center py-3">
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             `);
-            detailsWrapper.slideDown();
+                        detailsWrapper.slideDown();
 
-            // Gọi API lấy chi tiết
-            $.ajax({
-                url: "{{ route('device-borrows.details', ['id' => ':id']) }}".replace(':id', borrowId),
-                method: 'GET',
-                success: function(response) {
-                    console.log('Response:', response);
-                    if (response.success) {
-                        detailsContainer.html(response.html);
-                    } else {
-                        detailsContainer.html(`
+                        // Gọi API lấy chi tiết
+                        $.ajax({
+                            url: "{{ route('device-borrows.details', ['id' => ':id']) }}".replace(':id',
+                                borrowId),
+                            method: 'GET',
+                            success: function(response) {
+                                console.log('Response:', response);
+                                if (response.success) {
+                                    detailsContainer.html(response.html);
+                                } else {
+                                    detailsContainer.html(`
                             <div class="alert alert-danger m-3">
                                 ${response.message || 'Không thể tải chi tiết phiếu mượn'}
                             </div>
                         `);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                    console.error('Status:', status);
-                    console.error('Response:', xhr.responseText);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error:', error);
+                                console.error('Status:', status);
+                                console.error('Response:', xhr.responseText);
 
-                    detailsContainer.html(`
+                                detailsContainer.html(`
                         <div class="alert alert-danger m-3">
                             Có lỗi xảy ra khi tải chi tiết phiếu mượn
                         </div>
                     `);
-                }
-            });
-        });
-    });
-</script>
-@endsection
+                            }
+                        });
+                    });
+                });
+            </script>
+        @endsection

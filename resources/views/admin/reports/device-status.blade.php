@@ -64,6 +64,9 @@
                                                         @case('broken')
                                                             <span class="badge badge-danger">Hỏng</span>
                                                             @break
+                                                            @case('assigned')
+                                                                <span class="badge badge-info">Đã cấp phát cho giảng viên</span>
+                                                            @break
                                                         @default
                                                             <span class="badge badge-secondary">{{ $status }}</span>
                                                     @endswitch

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('device_id'); // Liên kết về bảng devices
             $table->string('code')->unique(); // Mã thiết bị riêng (như QR code hay dán label)
-            $table->enum('status', ['available', 'pending', 'in_use', 'maintenance', 'broken'])->default('available');
+            $table->enum('status', ['available', 'pending', 'in_use', 'maintenance', 'broken', 'assigned'])->default('available');
             $table->timestamps();
 
             $table->foreign('device_id')->references('id')->on('devices')->onDelete('cascade');

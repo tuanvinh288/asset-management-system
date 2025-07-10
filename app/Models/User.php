@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'department_id',
     ];
 
     /**
@@ -50,5 +51,10 @@ class User extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function assignedDevices()
+    {
+        return $this->hasMany(\App\Models\DeviceItem::class, 'user_id');
     }
 }

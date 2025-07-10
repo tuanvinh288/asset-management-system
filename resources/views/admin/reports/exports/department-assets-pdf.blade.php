@@ -60,25 +60,23 @@
         <table>
             <thead>
                 <tr>
-                    <th>Mã thiết bị</th>
-                    <th>Tên thiết bị</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày mua</th>
-                    <th>Giá trị</th>
+                    <th>#</th>
+                    <th>Tên phòng</th>
+                    <th>Mã phòng</th>
+                    <th>Ghi chú</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($department->deviceItems as $item)
+                @forelse($department->rooms as $i => $room)
                 <tr>
-                    <td>{{ $item->code }}</td>
-                    <td>{{ $item->device->name }}</td>
-                    <td>{{ $item->status }}</td>
-                    <td>{{ $item->purchase_date }}</td>
-                    <td>{{ number_format($item->value) }} VNĐ</td>
+                    <td>{{ $i + 1 }}</td>
+                    <td>{{ $room->name }}</td>
+                    <td>{{ $room->code }}</td>
+                    <td>{{ $room->note }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" style="text-align: center;">Không có thiết bị nào</td>
+                    <td colspan="4" style="text-align: center;">Không có phòng nào</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -90,4 +88,4 @@
         Trang {PAGE_NUM} / {PAGE_COUNT}
     </div>
 </body>
-</html> 
+</html>

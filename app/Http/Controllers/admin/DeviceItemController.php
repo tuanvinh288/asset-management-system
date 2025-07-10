@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DeviceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 
 class DeviceItemController extends Controller
 {
@@ -138,5 +139,26 @@ class DeviceItemController extends Controller
         return response()->json([
             'device_items' => $deviceItems
         ]);
+    }
+
+    // Hiển thị chi tiết thiết bị (bổ sung danh sách giảng viên)
+    public function show($id)
+    {
+        $deviceItem = DeviceItem::with('user', 'device')->findOrFail($id);
+        $teachers = User::role('teacher')->get();
+        return view('admin.device-items.show', compact('deviceItem', 'teachers'));
+    }
+
+    // Xử lý cấp phát thiết bị cho giảng viên
+    public function assignToTeacher(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+        $deviceItem = DeviceItem::findOrFail($id);
+        $deviceItem->user_id = $request->user_id;
+        $deviceItem->status = 'assigned';
+        $deviceItem->save();
+        return back()->with('success', 'Cấp phát thiết bị thành công!');
     }
 }

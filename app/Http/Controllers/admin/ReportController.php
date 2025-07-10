@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\admin;
 
-use PDF;
 use App\Models\Department;
 use App\Models\DeviceItem;
 use App\Models\Maintenance;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Exports\MaintenanceCostsExport;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 use Maatwebsite\Excel\Facades\Excel as ExcelFacade;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -22,9 +22,7 @@ class ReportController extends Controller
 
     public function departmentAssets()
     {
-        $departments = Department::with(['deviceItems' => function($query) {
-            $query->with('device');
-        }])->get();
+        $departments = Department::with(['rooms'])->get();
 
         return view('admin.reports.department-assets', compact('departments'));
     }
@@ -45,13 +43,13 @@ class ReportController extends Controller
             $statusCounts = $deviceItems->groupBy('status')->map->count();
             $total = $deviceItems->count();
         }
-        
+
         $statusPercentages = $statusCounts->map(function ($count) use ($total) {
             return $total > 0 ? ($count / $total) * 100 : 0;
         });
-        
+
         $deviceCounts = $statusCounts->toArray();
-        
+
         return view('admin.reports.device-status', compact('statusPercentages', 'deviceCounts'));
     }
 
@@ -63,23 +61,25 @@ class ReportController extends Controller
             'pending' => 'Đang chờ',
             'in_use' => 'Đang sử dụng',
             'maintenance' => 'Bảo trì',
-            'broken' => 'Hỏng'
+            'broken' => 'Hỏng',
+            'assigned' => 'Đã cấp phát cho giảng viên'
         ];
-        
+
         if ($deviceItems->isEmpty()) {
             $statusCounts = collect([
                 'available' => 0,
                 'pending' => 0,
                 'in_use' => 0,
                 'maintenance' => 0,
-                'broken' => 0
+                'broken' => 0,
+                'assigned' => 0
             ]);
             $total = 0;
         } else {
             $statusCounts = $deviceItems->groupBy('status')->map->count();
             $total = $deviceItems->count();
         }
-        
+
         $formattedData = collect();
         foreach ($statusCounts as $status => $count) {
             $percentage = $total > 0 ? round(($count / $total) * 100, 2) : 0;
@@ -96,11 +96,9 @@ class ReportController extends Controller
             'date' => now()->format('d/m/Y')
         ];
 
-        $pdf = PDF::loadView('admin.reports.exports.device-status-pdf', $data, [], [
-            'title' => 'Báo cáo tình trạng thiết bị',
-            'format' => 'A4',
-            'orientation' => 'P'
-        ]);
+        $pdf = Pdf::loadView('admin.reports.exports.device-status-pdf', $data);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->getDomPDF()->set_option('title', 'Báo cáo tình trạng thiết bị');
 
         return $pdf->stream('bao-cao-tinh-trang-thiet-bi.pdf');
     }
@@ -110,7 +108,7 @@ class ReportController extends Controller
         $maintenances = Maintenance::with(['deviceItem.device.category'])->get();
         $totalCost = $maintenances->sum('cost');
         $averageCost = $maintenances->count() > 0 ? $totalCost / $maintenances->count() : 0;
-        
+
         return view('admin.reports.maintenance-costs', compact('maintenances', 'totalCost', 'averageCost'));
     }
 
@@ -127,11 +125,9 @@ class ReportController extends Controller
             'date' => now()->format('d/m/Y')
         ];
 
-        $pdf = PDF::loadView('admin.reports.exports.maintenance-costs-pdf', $data, [], [
-            'title' => 'Báo cáo chi phí bảo trì',
-            'format' => 'A4',
-            'orientation' => 'P'
-        ]);
+        $pdf = Pdf::loadView('admin.reports.exports.maintenance-costs-pdf', $data);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->getDomPDF()->set_option('title', 'Báo cáo chi phí bảo trì');
 
         return $pdf->stream('bao-cao-chi-phi-bao-tri.pdf');
     }
@@ -139,7 +135,7 @@ class ReportController extends Controller
     public function maintenanceCostsExcel()
     {
         $maintenances = Maintenance::with(['deviceItem.device.category'])->get();
-        
+
         $headers = [
             'Mã thiết bị',
             'Tên thiết bị',
@@ -163,7 +159,7 @@ class ReportController extends Controller
         })->toArray();
 
         $filePath = storage_path('app/public/bao-cao-chi-phi-bao-tri.csv');
-        
+
         // Add BOM for UTF-8
         file_put_contents($filePath, "\xEF\xBB\xBF");
 
@@ -184,20 +180,16 @@ class ReportController extends Controller
 
     public function exportDepartmentAssetsPDF()
     {
-        $departments = Department::with(['deviceItems' => function($query) {
-            $query->with('device');
-        }])->get();
+        $departments = Department::with(['rooms'])->get();
 
         $data = [
             'departments' => $departments,
             'date' => now()->format('d/m/Y')
         ];
 
-        $pdf = PDF::loadView('admin.reports.exports.department-assets-pdf', $data, [], [
-            'title' => 'Báo cáo tài sản theo phòng ban',
-            'format' => 'A4',
-            'orientation' => 'L'
-        ]);
+        $pdf = Pdf::loadView('admin.reports.exports.department-assets-pdf', $data);
+        $pdf->setPaper('a4', 'landscape');
+        $pdf->getDomPDF()->set_option('title', 'Báo cáo tài sản theo phòng ban');
 
         return $pdf->stream('bao-cao-tai-san-theo-phong-ban.pdf');
     }
@@ -211,4 +203,4 @@ class ReportController extends Controller
     {
         return ExcelFacade::download(new MaintenanceCostsExport, 'bao-cao-chi-phi-bao-tri.xlsx');
     }
-} 
+}

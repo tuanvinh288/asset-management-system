@@ -44,11 +44,21 @@ Route::prefix('admin')->group(function () {
         Route::resource('suppliers', SupplierController::class);
         Route::resource('categories', CategoryController::class);
 
+        // Import Excel cho users
+        Route::post('users/import', [UserController::class, 'import'])->name('users.import');
+        Route::get('users/download-template', function() {
+            return response()->download(public_path('admin/template_excel/import_excel.xlsx'));
+        })->name('users.downloadTemplate');
+
         // Device management
         Route::resource('devices', DeviceController::class);
         Route::resource('device-items', DeviceItemController::class);
         Route::get('/device-items/{device_id}', [DeviceItemController::class, 'getDeviceItems'])->name('api.device-items');
         Route::get('/device-items/{device}/json', [DeviceItemController::class, 'json'])->name('device-items.json');
+
+        // Chi tiết và cấp phát thiết bị con
+        Route::get('device-items/{id}', [DeviceItemController::class, 'show'])->name('device-items.show');
+        Route::post('device-items/{id}/assign-teacher', [DeviceItemController::class, 'assignToTeacher'])->name('device-items.assignTeacher');
 
         // Room management
         Route::resource('rooms', RoomController::class);
@@ -96,6 +106,13 @@ Route::prefix('admin')->group(function () {
 
         // Room borrow routes
         Route::get('/room-borrows/{roomBorrow}/send-reminder', [RoomBorrowController::class, 'sendReturnReminder'])->name('room-borrows.send-reminder');
+        // Đổi mật khẩu lần đầu
+        Route::get('first-password/change', [UserController::class, 'showFirstPasswordForm'])->name('first-password.change');
+        Route::post('first-password/change', [UserController::class, 'updateFirstPassword'])->name('first-password.update');
+        // Cấp thiết bị cho giảng viên
+        Route::post('users/{user}/assign-device', [UserController::class, 'assignDevice'])->name('users.assignDevice');
+        // Danh sách thiết bị đã cấp phát cho giảng viên
+        Route::get('users/{user}/assigned-devices', [UserController::class, 'assignedDevices'])->name('users.assignedDevices');
     });
 });
 

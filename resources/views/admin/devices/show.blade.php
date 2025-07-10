@@ -82,7 +82,6 @@
                                     <tr>
                                         <th style="width: 50px;">#</th>
                                         <th>Mã thiết bị</th>
-                                        <th>Trạng thái</th>
                                         <th>Tình trạng</th>
                                         <th>Ngày tạo</th>
                                         <th style="width: 120px;">Thao tác</th>
@@ -93,19 +92,7 @@
                                     <tr>
                                         <td><strong>{{ $key + 1 }}</strong></td>
                                         <td>{{ $part->code }}</td>
-                                        <td>
-                                            @if($part->status == 'available')
-                                                <span class="badge badge-success">Có sẵn</span>
-                                            @elseif($part->status == 'pending')
-                                                <span class="badge badge-warning">Đang chờ duyệt</span>
-                                            @elseif($part->status == 'in_use')
-                                                <span class="badge badge-info">Đang sử dụng</span>
-                                            @elseif($part->status == 'maintenance')
-                                                <span class="badge badge-warning">Đang bảo trì</span>
-                                            @elseif($part->status == 'broken')
-                                                <span class="badge badge-danger">Hỏng</span>
-                                            @endif
-                                        </td>
+
                                         <td>
                                             @if($part->status == 'available')
                                                 <span class="badge badge-success">Sẵn sàng</span>
@@ -117,28 +104,31 @@
                                                 <span class="badge badge-warning">Đang bảo trì</span>
                                             @elseif($part->status == 'broken')
                                                 <span class="badge badge-danger">Không thể sử dụng</span>
+                                            @elseif($part->status == 'assigned')
+                                                <span class="badge badge-info">Đã cấp phát</span>
                                             @endif
                                         </td>
                                         <td>{{ $part->created_at->format('d/m/Y') }}</td>
                                         <td>
                                             <div class="d-flex">
-                                                <a href="{{ route('qrcode.show', $part->id) }}" class="btn btn-info btn-sm mr-1" title="QR Code">
-                                                    <i class="fa fa-qrcode"></i>
+
+                                                <a href="{{ route('device-items.show', $part->id) }}" class="btn btn-success btn-sm mr-1" title="Cấp phát thiết bị">
+                                                    <i class="fa fa-user-plus"></i> Cấp phát
                                                 </a>
-                                                <a href="{{ route('device-items.edit', $part->id) }}" 
-                                                   class="btn btn-warning btn-sm mr-1 edit-device-item" 
+                                                <a href="{{ route('device-items.edit', $part->id) }}"
+                                                   class="btn btn-warning btn-sm mr-1 edit-device-item"
                                                    data-toggle="modal"
                                                    data-target="#editDeviceItemModal"
-                                                   data-id="{{ $part->id }}" 
-                                                   data-code="{{ $part->code }}" 
-                                                   data-serial-number="{{ $part->serial_number }}" 
-                                                   data-status="{{ $part->status }}" 
-                                                   data-room-id="{{ $part->room_id }}" 
-                                                   data-supplier-id="{{ $part->supplier_id }}" 
+                                                   data-id="{{ $part->id }}"
+                                                   data-code="{{ $part->code }}"
+                                                   data-serial-number="{{ $part->serial_number }}"
+                                                   data-status="{{ $part->status }}"
+                                                   data-room-id="{{ $part->room_id }}"
+                                                   data-supplier-id="{{ $part->supplier_id }}"
                                                    data-is-fixed="{{ $part->is_fixed }}"
-                                                   data-qr-code="{{ $part->qr_code }}" 
-                                                   data-qr-token="{{ $part->qr_token }}" 
-                                                   data-last-scanned-at="{{ $part->last_scanned_at }}" 
+                                                   data-qr-code="{{ $part->qr_code }}"
+                                                   data-qr-token="{{ $part->qr_token }}"
+                                                   data-last-scanned-at="{{ $part->last_scanned_at }}"
                                                    data-created-at="{{ $part->created_at }}">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
