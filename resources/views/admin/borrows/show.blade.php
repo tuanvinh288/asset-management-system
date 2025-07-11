@@ -44,7 +44,7 @@
                                     </p>
                                 </div>
                             </div>
-                            
+
                         </div>
 
                         <div class="row">
@@ -170,7 +170,7 @@
                         </div>
 
                         <div class="form-group">
-                            @if($borrow->status === 'pending')
+                            @if($borrow->status === 'pending' && @role('admin'))
                                 <form method="POST" action="{{ route('device-borrows.approve', $borrow->id) }}" style="display:inline;">
                                     @csrf
                                     <button class="btn btn-success">
@@ -198,4 +198,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

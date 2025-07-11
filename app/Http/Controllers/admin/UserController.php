@@ -171,4 +171,10 @@ class UserController extends Controller
         $deviceItems = DeviceItem::whereNull('user_id')->where('status', 'available')->get();
         return view('admin.users.show', compact('user', 'deviceItems'));
     }
+
+    public function assignedDevices($id)
+    {
+        $user = \App\Models\User::with(['assignedDevices.device'])->findOrFail($id);
+        return view('admin.users.assigned_devices', compact('user'));
+    }
 }
