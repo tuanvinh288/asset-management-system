@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         // Chỉ thực hiện với MySQL
-        DB::statement("ALTER TABLE device_items MODIFY COLUMN status ENUM('available', 'pending', 'in_use', 'maintenance', 'broken') NOT NULL DEFAULT 'available'");
+       DB::statement("ALTER TABLE device_items  MODIFY COLUMN status ENUM('available', 'pending', 'in_use', 'maintenance', 'broken', 'assigned') 
+            NOT NULL DEFAULT 'available'");
     }
 
     /**
@@ -22,6 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         // Nếu muốn rollback về enum cũ (tuỳ vào enum cũ của bạn)
-        DB::statement("ALTER TABLE device_items MODIFY COLUMN status ENUM('available', 'in_use', 'maintenance', 'broken') NOT NULL DEFAULT 'available'");
+        DB::statement("ALTER TABLE device_items  MODIFY COLUMN status ENUM('available', 'pending', 'in_use', 'maintenance', 'broken', 'assigned') 
+            NOT NULL DEFAULT 'available'");
     }
 };
