@@ -111,10 +111,11 @@
                                         <td>{{ $part->created_at->format('d/m/Y') }}</td>
                                         <td>
                                             <div class="d-flex">
-
+                                                @if($part->status == 'available')
                                                 <a href="{{ route('device-items.show', $part->id) }}" class="btn btn-success btn-sm mr-1" title="Cấp phát thiết bị">
                                                     <i class="fa fa-user-plus"></i> Cấp phát
                                                 </a>
+                                                @endif
                                                 <a href="{{ route('device-items.edit', $part->id) }}"
                                                    class="btn btn-warning btn-sm mr-1 edit-device-item"
                                                    data-toggle="modal"
