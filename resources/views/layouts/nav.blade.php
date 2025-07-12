@@ -2,10 +2,10 @@
     <div class="quixnav-scroll">
         <ul class="metismenu" id="menu">
             <li class="nav-label first">Main Menu</li>
+            @role('admin')
             <li><a href="{{ route('dashboard') }}" aria-expanded="false"><i class="icon icon-single-04"></i><span
                 class="nav-text">Trang chủ</span></a></li>
 
-            @role('admin')
             <li class="nav-label">Quản lý hệ thống</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">

@@ -21,7 +21,7 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <h4 class="text-center mb-4">Đăng nhập</h4>
-                                    
+                                    @include('admin.components.message')
                                     <!-- Laravel Blade Form -->
                                     <form method="POST" action="{{ route('login') }}">
                                         @csrf

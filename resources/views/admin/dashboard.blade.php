@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="content-body">
+    @role('admin')
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-3 col-xxl-3 col-sm-6">
@@ -319,6 +320,21 @@
             </div>
         </div>
     </div>
+    @endrole
+    @hasrole('student')
+    <div class="container-fluid">
+        <div class="row">
+            <h2>Chào mừng bạn đến với website quản lý thiết bị</h2>
+        </div></div>
+@endhasrole
+
+@hasrole('teacher')
+    <div class="container-fluid">
+        <div class="row">
+            <h2>Chào mừng bạn đến với website quản lý thiết bị</h2>
+        </div></div>
+@endhasrole
+    
 </div>
 @endsection
 
