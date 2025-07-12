@@ -59,6 +59,25 @@
                                 @csrf
 
                                 <div class="row">
+                                    @role('admin')
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="text-label">Người mượn</label>
+                                                <select class="form-control select2" name="user_id" id="user_id" required>
+                                                    <option value="">Chọn người mượn</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}"
+                                                            {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                                            {{ $user->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($errors->has('device_id'))
+                                                    <span class="text-danger">{{ $errors->first('device_id') }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endrole
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="text-label">Ngày mượn *</label>

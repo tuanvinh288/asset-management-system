@@ -31,7 +31,7 @@
     </div>
     <div id="main-wrapper">
         <div class="nav-header">
-            <a href="index.html" class="brand-logo">
+            <a href="@role('admin'){{ route('dashboard') }}@endrole" class="brand-logo">
                 <img class="logo-abbr" src="{{ asset('admin/images/logo.png') }}" alt="">
                 <img class="logo-compact" src="{{ asset('admin/images/logo-text.png') }}" alt="">
                 <img class="brand-title" src="{{ asset('admin/images/logo-text.png') }}" alt="">

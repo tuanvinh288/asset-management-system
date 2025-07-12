@@ -35,8 +35,9 @@ class BorrowController extends Controller
     public function create()
     {
         $devices = Device::all();
+        $users = User::all();
         $deviceItems = DeviceItem::where('status', 'available')->whereNull('user_id')->get();
-        return view('admin.borrows.create', compact('deviceItems', 'devices'));
+        return view('admin.borrows.create', compact('deviceItems', 'devices', 'users'));
     }
 
     public function store(Request $request)
@@ -69,12 +70,16 @@ class BorrowController extends Controller
             'device_image_before.mimes' => 'Ảnh phải có định dạng jpeg, png, jpg hoặc gif',
             'device_image_before.max' => 'Kích thước ảnh không được vượt quá 2MB',
         ]);
-
+if (auth()->user()->hasRole('admin')) {
+    $userId = $request['user_id'];
+} else {
+$userId = auth()->id();
+}
         DB::beginTransaction();
         try {
             // Tạo phiếu mượn
             $borrowData = [
-                'user_id' => auth()->id(),
+                'user_id' => $userId,
                 'borrow_date' => $validated['borrow_date'],
                 'return_date' => $validated['return_date'],
                 'reason' => $validated['reason'],

@@ -43,6 +43,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         
-        return redirect()->route('login')->with('success', 'Thêm thiết bị thành công!');
+        return redirect()->route('login')->with('success', 'Thêm tài khoản thành công!');
     }
 }

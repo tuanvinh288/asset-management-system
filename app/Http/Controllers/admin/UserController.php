@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\UserAccountInfoMail;
+use App\Models\Borrow;
 use Illuminate\Support\Facades\Mail;
 use App\Models\DeviceItem;
 
@@ -84,6 +85,7 @@ class UserController extends Controller
     // Xóa người dùng
     public function destroy($id)
     {
+        Borrow::where('user_id', $id)->update(['user_id' => 1]);
         $user = User::findOrFail($id);
         $user->delete();
 
