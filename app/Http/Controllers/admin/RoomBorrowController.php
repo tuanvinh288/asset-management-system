@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\ReturnReminder;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class RoomBorrowController extends Controller
 {
@@ -29,11 +30,12 @@ class RoomBorrowController extends Controller
 
     public function create()
     {
-        $rooms = Room::whereDoesntHave('borrows', function($query) {
+        $users = User::all();
+        $rooms = Room::whereDoesntHave('borrows', function ($query) {
             $query->whereIn('status', ['pending', 'approved']);
         })->get();
 
-        return view('admin.room-borrows.create', compact('rooms'));
+        return view('admin.room-borrows.create', compact('rooms', 'users'));
     }
 
     public function store(Request $request)
@@ -44,13 +46,17 @@ class RoomBorrowController extends Controller
             'return_date' => 'required|date|after:borrow_date',
             'reason' => 'required|string|max:1000'
         ]);
-
+        if (auth()->user()->hasRole('admin')) {
+            $userId = $request['user_id'];
+        } else {
+            $userId = auth()->id();
+        }
         DB::beginTransaction();
         try {
             // Tạo phiếu mượn phòng
             $roomBorrow = RoomBorrow::create([
                 'room_id' => $validated['room_id'],
-                'user_id' => auth()->id(),
+                'user_id' => $userId,
                 'borrow_date' => $validated['borrow_date'],
                 'return_date' => $validated['return_date'],
                 'reason' => $validated['reason'],
@@ -142,7 +148,7 @@ class RoomBorrowController extends Controller
         try {
             // Load các relationship cần thiết
             $roomBorrow->load(['user', 'room']);
-            
+
             // Gửi email thông báo
             Mail::to($roomBorrow->user->email)->send(new ReturnReminder($roomBorrow, 'room', false));
 

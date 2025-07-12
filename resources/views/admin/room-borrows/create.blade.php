@@ -17,6 +17,23 @@
                     <div class="card-body">
                         <form action="{{ route('room-borrows.store') }}" method="POST">
                             @csrf
+                            @role('admin')
+                                            <div class="form-group">
+                                                <label class="text-label">Người mượn <span class="text-danger">*</span></label>
+                                                <select class="form-control select2" name="user_id" id="user_id" required>
+                                                    <option value="">Chọn người mượn</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}"
+                                                            {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                                            {{ $user->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($errors->has('device_id'))
+                                                    <span class="text-danger">{{ $errors->first('device_id') }}</span>
+                                                @endif
+                                            </div>
+                                    @endrole
                             <div class="form-group">
                                 <label>Phòng <span class="text-danger">*</span></label>
                                 <select name="room_id" class="form-control @error('room_id') is-invalid @enderror" required>
