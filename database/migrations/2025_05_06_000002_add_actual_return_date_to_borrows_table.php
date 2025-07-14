@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::table('borrows', function (Blueprint $table) {
             $table->dateTime('actual_return_date')->nullable()->after('return_date');
+            $table->string('return_note')->nullable()->after('device_image_after');
         });
     }
 
@@ -17,6 +18,7 @@ return new class extends Migration
     {
         Schema::table('borrows', function (Blueprint $table) {
             $table->dropColumn('actual_return_date');
+            $table->dropColumn('return_note');
         });
     }
-}; 
+};

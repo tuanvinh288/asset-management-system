@@ -6,7 +6,7 @@
         <div class="row page-titles mx-0">
             <div class="col-sm-6 p-md-0">
                 <div class="welcome-text">
-                    <h4>Chi tiết phiếu mượn</h4>
+                    <h4>{{ $borrow->return_date ? 'Chi tiết phiếu trả' : 'Chi tiết phiếu mượn' }}</h4>
                     <span class="ml-1">#{{ $borrow->id }}</span>
                 </div>
             </div>
@@ -31,14 +31,14 @@
                                     <label class="text-label">Trạng thái</label>
                                     <p class="form-control-static">
                                         @php
-                                            $statusConfig = [
+                                            $statusConfig1 = [
                                                 'pending' => ['color' => 'warning', 'text' => 'Chờ duyệt'],
                                                 'approved' => ['color' => 'info', 'text' => 'Đã duyệt'],
                                                 'borrowed' => ['color' => 'primary', 'text' => 'Đang mượn'],
                                                 'returned' => ['color' => 'success', 'text' => 'Đã trả'],
                                                 'cancelled' => ['color' => 'danger', 'text' => 'Đã hủy']
                                             ];
-                                            $status = $statusConfig[$borrow->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                            $status = $statusConfig1[$borrow->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
                                         @endphp
                                         <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
                                     </p>
@@ -74,13 +74,24 @@
                             <label class="text-label">Lý do mượn</label>
                             <p class="form-control-static">{{ $borrow->reason }}</p>
                         </div>
-
+                        <div class="row">
+                            <div class="col-md-6">
                         @if($borrow->note)
                         <div class="form-group">
-                            <label class="text-label">Ghi chú</label>
+                            <label class="text-label">Ghi chú trước trả</label>
                             <p class="form-control-static">{{ $borrow->note }}</p>
                         </div>
                         @endif
+                            </div>
+                            <div class="col-md-6">
+                                @if($borrow->return_note)
+                                <div class="form-group">
+                                    <label class="text-label">Ghi chú sau trả</label>
+                                    <p class="form-control-static">{{ $borrow->return_note }}</p>
+                                </div>
+                                @endif
+                                    </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-md-6">
@@ -157,8 +168,18 @@
                                             <td>{{ $detail->deviceItem->code }}</td>
                                             <td>{{ $detail->deviceItem->serial_number }}</td>
                                             <td>
+                                            
                                                 @php
-                                                    $status = $statusConfig[$detail->deviceItem->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                            $statusConfig2 = [
+                                                'available' => ['color' => 'success', 'text' => 'Sẵn sàng'],
+                                                'pending' => ['color' => 'warning', 'text' => 'Đang chờ duyệt mượn'],
+                                                'in_use' => ['color' => 'info', 'text' => 'Đang được mượn'],
+                                                'maintenance' => ['color' => 'warning', 'text' => 'Đang bảo trì'],
+                                                'broken' => ['color' => 'danger', 'text' => 'Không thể sử dụng'],
+                                                'assigned' => ['color' => 'info', 'text' => 'Thiết bị đã cấp']
+                                            ];
+
+                                                    $status = $statusConfig2[$detail->deviceItem->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
                                                 @endphp
                                                 <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
                                             </td>
@@ -178,12 +199,6 @@
                                         <i class="fa fa-check"></i> Duyệt
                                     </button>
                                 </form>
-                                <form method="POST" action="{{ route('device-borrows.cancel', $borrow->id) }}" style="display:inline;">
-                                    @csrf
-                                    <button class="btn btn-danger">
-                                        <i class="fa fa-times"></i> Hủy
-                                    </button>
-                                </form>
                             @elseif($borrow->status === 'approved')
                                 <form method="POST" action="{{ route('device-borrows.return', $borrow->id) }}" style="display:inline;">
                                     @csrf
@@ -193,6 +208,14 @@
                                 </form>
                             @endif
                             @endrole
+                            @if($borrow->status === 'pending')
+                            <form method="POST" action="{{ route('device-borrows.cancel', $borrow->id) }}" style="display:inline;">
+                                @csrf
+                                <button class="btn btn-danger">
+                                    <i class="fa fa-times"></i> Hủy
+                                </button>
+                            </form>
+                            @endif
                         </div>
                     </div>
                 </div>

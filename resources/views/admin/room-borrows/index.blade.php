@@ -46,7 +46,7 @@
                                 <tbody>
                                     @forelse($roomBorrows as $roomBorrow)
                                         <tr>
-                                            <td>{{ $roomBorrow->code }}</td>
+                                            <td>{{ $roomBorrow->id }}</td>
                                             <td>{{ $roomBorrow->user->name }}</td>
                                             <td>{{ $roomBorrow->room->name }}</td>
                                             <td>{{ $roomBorrow->borrow_date }}</td>
@@ -71,7 +71,7 @@
                                                     @case('approved')
                                                         <span class="badge badge-success">Đã duyệt</span>
                                                         @break
-                                                    @case('rejected')
+                                                    @case('cancelled')
                                                         <span class="badge badge-danger">Từ chối</span>
                                                         @break
                                                     @case('returned')
@@ -94,38 +94,41 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('room-borrows.show', $roomBorrow->id) }}" class="btn btn-info btn-sm">
+                                                <a href="{{ route('room-borrows.show', $roomBorrow->id) }}" class="btn btn-info btn-sm" title="Xem chi tiết phiếu mượn">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                                 @role('admin')
                                                 @if($roomBorrow->status == 'pending')
                                                     <form action="{{ route('room-borrows.approve', $roomBorrow->id) }}" method="POST" style="display: inline;">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                        <button type="submit" class="btn btn-success btn-sm" title="Duyệt phiếu mượn">
                                                             <i class="fa fa-check"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('room-borrows.cancel', $roomBorrow->id) }}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            <i class="fa fa-times"></i>
-                                                        </button>
-                                                    </form>
+
                                                 @endif
                                                 @if($roomBorrow->status == 'approved')
                                                     <form action="{{ route('room-borrows.return', $roomBorrow->id) }}" method="POST" style="display: inline;">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                        <button type="submit" class="btn btn-primary btn-sm" title="Đánh dấu đã trả phòng">
                                                             <i class="fa fa-undo"></i>
                                                         </button>
                                                     </form>
                                                     @if($roomBorrow->return_date > now())
-                                                        <button type="button" class="btn btn-warning btn-sm send-reminder" data-id="{{ $roomBorrow->id }}">
+                                                        <button type="button" class="btn btn-warning btn-sm send-reminder" data-id="{{ $roomBorrow->id }}" title="Gửi thông báo nhắc trả phòng">
                                                             <i class="fas fa-bell"></i>Thông báo
                                                         </button>
                                                     @endif
                                                 @endif
                                                 @endrole
+                                                @if($roomBorrow->status == 'pending')
+                                                <form action="{{ route('room-borrows.cancel', $roomBorrow->id) }}" method="POST" style="display: inline;">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Huỷ phiếu mượn">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -151,10 +154,10 @@ $(document).ready(function() {
         debugger;
         const button = $(this);
         const borrowId = button.data('id');
-        
+
         // Vô hiệu hóa nút trong khi đang xử lý
         button.prop('disabled', true);
-        
+
         $.ajax({
             url: `/admin/room-borrows/${borrowId}/send-reminder`,
             method: 'GET',

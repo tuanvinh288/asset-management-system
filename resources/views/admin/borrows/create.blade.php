@@ -121,8 +121,8 @@
                                     <div id="device_items_list" class="row">
                                         <!-- Chi tiết thiết bị sẽ được tải qua AJAX -->
                                     </div>
-                                    @if ($errors->has('device_items'))
-                                        <span class="text-danger">{{ $errors->first('device_items') }}</span>
+                                    @if ($errors->has('device_item_id'))
+                                        <span class="text-danger">{{ $errors->first('device_item_id') }}</span>
                                     @endif
                                 </div>
 
@@ -228,11 +228,11 @@
                                     'broken': 'Hư hỏng'
                                 };
                                 const statusClass = `status-${item.status}`;
-                                html += `<div class=\"device-item\">
-                                    <span class=\"device-checkbox\"><input class=\"form-check-input\" type=\"checkbox\" name=\"device_items[]\" value=\"${item.id}\" id=\"item_${item.id}\"></span>
-                                    <label class=\"device-code\" for=\"item_${item.id}\">${item.code}</label>
-                                    <span class=\"status-badge ${statusClass}\">${statusMap[item.status]}</span>
-                                </div>`;
+                                html += `<div class=\"device-item\">`
+                                    + `<span class=\"device-checkbox\"><input class=\"form-check-input\" type=\"radio\" name=\"device_item_id\" value=\"${item.id}\" id=\"item_${item.id}\"></span>`
+                                    + `<label class=\"device-code\" for=\"item_${item.id}\">${item.code}</label>`
+                                    + `<span class=\"status-badge ${statusClass}\">${statusMap[item.status]}</span>`
+                                    + `</div>`;
                             });
                             html += '</div>';
                         } else {
@@ -240,12 +240,10 @@
                         }
                         $('#device_items_list').html(html);
 
-                        // Re-check previously selected items
-                        @if (old('device_items'))
-                            var oldItems = @json(old('device_items'));
-                            oldItems.forEach(function(itemId) {
-                                $('#device_items_list input[value="' + itemId + '"]').prop('checked', true);
-                            });
+                        // Re-check previously selected item (radio)
+                        @if (old('device_item_id'))
+                            var oldItem = @json(old('device_item_id'));
+                            $('#device_items_list input[value="' + oldItem + '"]').prop('checked', true);
                         @endif
                     },
                     error: function(xhr, status, error) {

@@ -188,6 +188,7 @@
                                                 <option value="in_use">Đang sử dụng</option>
                                                 <option value="maintenance">Bảo trì</option>
                                                 <option value="broken">Hỏng</option>
+                                                <option value="assigned">Đã được cấp</option>
                                             </select>
                                         </td>
                                         <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
