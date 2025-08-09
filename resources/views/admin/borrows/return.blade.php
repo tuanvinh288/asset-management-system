@@ -71,26 +71,27 @@
                                         </thead>
                                         <tbody>
                                             @foreach($borrow->details as $detail)
-                                                @php $item = $detail->deviceItem; @endphp
-                                                @if($item)
-                                                <tr>
-                                                    <td>{{ $item->code }}</td>
-                                                    <td>{{ $item->serial_number }}</td>
-                                                    <td>
-                                                        @php
-                                                            $statusConfig = [
-                                                                'new' => ['color' => 'success', 'text' => 'Mới'],
-                                                                'good' => ['color' => 'info', 'text' => 'Tốt'],
-                                                                'normal' => ['color' => 'warning', 'text' => 'Bình thường'],
-                                                                'damaged' => ['color' => 'danger', 'text' => 'Hỏng']
-                                                            ];
-                                                            $status = $statusConfig[$item->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
-                                                        @endphp
-                                                        <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
-                                                    </td>
-                                                </tr>
-                                                @endif
-                                            @endforeach
+                                        <tr>
+                                            <td>{{ $detail->deviceItem->code }}</td>
+                                            <td>{{ $detail->deviceItem->serial_number }}</td>
+                                            <td>
+                                            
+                                                @php
+                                            $statusConfig2 = [
+                                                'available' => ['color' => 'success', 'text' => 'Sẵn sàng'],
+                                                'pending' => ['color' => 'warning', 'text' => 'Đang chờ duyệt mượn'],
+                                                'in_use' => ['color' => 'info', 'text' => 'Đang được mượn'],
+                                                'maintenance' => ['color' => 'warning', 'text' => 'Đang bảo trì'],
+                                                'broken' => ['color' => 'danger', 'text' => 'Không thể sử dụng'],
+                                                'assigned' => ['color' => 'info', 'text' => 'Thiết bị đã cấp']
+                                            ];
+
+                                                    $status = $statusConfig2[$detail->deviceItem->status] ?? ['color' => 'secondary', 'text' => 'Không xác định'];
+                                                @endphp
+                                                <span class="badge badge-{{ $status['color'] }}">{{ $status['text'] }}</span>
+                                            </td>
+                                        </tr>
+                                        @endforeach
                                         </tbody>
                                     </table>
                                 </div>

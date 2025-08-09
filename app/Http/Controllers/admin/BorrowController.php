@@ -47,7 +47,8 @@ class BorrowController extends Controller
             'borrow_date' => 'required|date',
             'return_date' => 'required|date|after:borrow_date',
             'device_id' => 'required|exists:devices,id',
-            'device_item_id' => 'required|exists:device_items,id',
+            'device_items' => 'required|array|min:1',
+            'device_items.*' => 'exists:device_items,id',
             'reason' => 'required|string|max:1000',
             'note' => 'nullable|string|max:1000',
             'device_status_before' => 'required|in:new,good,normal,damaged',
@@ -58,8 +59,9 @@ class BorrowController extends Controller
             'return_date.after' => 'Ngày trả phải sau ngày mượn',
             'device_id.required' => 'Vui lòng chọn thiết bị',
             'device_id.exists' => 'Thiết bị không tồn tại',
-            'device_item_id.required' => 'Vui lòng chọn chi tiết thiết bị',
-            'device_item_id.exists' => 'Chi tiết thiết bị không tồn tại',
+            'device_items.required' => 'Vui lòng chọn ít nhất một chi tiết thiết bị',
+            'device_items.min' => 'Vui lòng chọn ít nhất một chi tiết thiết bị',
+            'device_items.*.exists' => 'Chi tiết thiết bị không tồn tại',
             'reason.required' => 'Vui lòng nhập lý do mượn',
             'reason.max' => 'Lý do mượn không được vượt quá 1000 ký tự',
             'device_status_before.required' => 'Vui lòng chọn trạng thái thiết bị',
@@ -94,16 +96,26 @@ class BorrowController extends Controller
 
             $borrow = Borrow::create($borrowData);
 
-            // Tạo chi tiết phiếu mượn (chỉ 1 thiết bị)
-            $deviceItemId = $validated['device_item_id'];
-            $deviceItem = DeviceItem::find($deviceItemId);
-            if ($deviceItem) {
-                $deviceItem->status = 'pending';
-                $deviceItem->save();
-                BorrowDetail::create([
-                    'borrow_id' => $borrow->id,
-                    'device_item_id' => $deviceItemId
-                ]);
+            // Tạo chi tiết phiếu mượn
+            foreach ($validated['device_items'] as $deviceItemId) {
+                try {
+                    $deviceItem = DeviceItem::find($deviceItemId);
+                    if ($deviceItem) {
+                        $deviceItem->status = 'pending';
+                        $deviceItem->save();
+                        // Tạo chi tiết mượn
+                        $borrowDetailData = [
+                            'borrow_id' => $borrow->id,
+                            'device_item_id' => $deviceItemId
+                        ];
+                        BorrowDetail::create($borrowDetailData);
+                    }
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return redirect()->back()
+                        ->withErrors(['error' => 'Lỗi khi tạo chi tiết mượn: ' . $e->getMessage()])
+                        ->withInput();
+                }
             }
 
             DB::commit();
@@ -151,6 +163,8 @@ class BorrowController extends Controller
 
     public function markReturned(Request $request, $id)
     {
+        
+
         $request->validate([
             'return_date' => 'required|date',
             'device_status_after' => 'required|in:new,good,normal,damaged',
@@ -180,13 +194,18 @@ class BorrowController extends Controller
                 'device_image_after' => $imagePath,
                 'device_status_after' => $request->device_status_after
             ]);
-
             // Cập nhật trạng thái các thiết bị
             foreach ($borrow->details as $detail) {
-                $detail->deviceItem->update([
-                    'status' => 'available',
-                    'condition' => $request->device_status_after
-                ]);
+                $deviceID = $detail->device_item_id;
+                $deviceDetail = DeviceItem::find($deviceID);
+                if ($request->device_status_after == "damaged") {
+                    $status = "broken";
+                } else {
+                    $status = "available";
+            
+                }
+                $deviceDetail->status = $status;
+$deviceDetail->save();
             }
 
             DB::commit();
@@ -293,4 +312,3 @@ class BorrowController extends Controller
         }
     }
 }
-
