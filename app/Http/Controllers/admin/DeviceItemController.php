@@ -130,11 +130,18 @@ class DeviceItemController extends Controller
         ]);
     }
 
-    public function json($deviceId)
+    public function json(Request $request, $deviceId)
     {
-        $deviceItems = DeviceItem::where('device_id', $deviceId)
-            ->where('status', 'available')
-            ->get(['id', 'code', 'status', 'serial_number']);
+        $query = DeviceItem::where('device_id', $deviceId);
+
+        if ($request->input('maintenance') == '1') {
+            
+            $query->where('status', 'broken');
+        } else {
+            $query->where('status', 'available');
+        }
+
+        $deviceItems = $query->get(['id', 'code', 'status', 'serial_number']);
 
         return response()->json([
             'device_items' => $deviceItems

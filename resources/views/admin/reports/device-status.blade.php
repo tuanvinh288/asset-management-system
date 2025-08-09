@@ -64,8 +64,8 @@
                                                         @case('broken')
                                                             <span class="badge badge-danger">Hỏng</span>
                                                             @break
-                                                            @case('assigned')
-                                                                <span class="badge badge-info">Đã cấp phát cho giảng viên</span>
+                                                        @case('assigned')
+                                                                <span class="badge badge-warning">Đã cấp phát cho giảng viên</span>
                                                             @break
                                                         @default
                                                             <span class="badge badge-secondary">{{ $status }}</span>
@@ -96,28 +96,38 @@
         const statusData = @json($statusPercentages);
         const deviceCounts = @json($deviceCounts);
 
-        const labels = Object.keys(statusData).map(status => {
-            switch(status) {
-                case 'available': return 'Có sẵn';
-                case 'pending': return 'Đang chờ';
-                case 'in_use': return 'Đang sử dụng';
-                case 'maintenance': return 'Bảo trì';
-                case 'broken': return 'Hỏng';
-                default: return status;
-            }
-        });
+        // Ánh xạ trạng thái với màu của Bootstrap badge để đồng nhất
+        // Bạn có thể thay đổi các mã màu này nếu theme của bạn dùng màu khác
+        const colorMap = {
+            'available': '#7ED321',  // Màu của badge-success (Xanh lá)
+            'pending': '#ffc107',    // Màu của badge-warning (Vàng)
+            'in_use': '#50E3C2',     // Màu của badge-info (Xanh lơ)
+            'maintenance': '#593bdb', // Màu của badge-primary (Xanh dương)
+            'broken': '#FF1616',     // Màu của badge-danger (Đỏ)
+            'assigned': '#FFAA16',    // Màu của badge-info (Xanh lơ) - giống 'in_use'
+        };
+
+        const statusLabels = {
+            'available': 'Có sẵn',
+            'pending': 'Đang chờ',
+            'in_use': 'Đang sử dụng',
+            'maintenance': 'Bảo trì',
+            'broken': 'Hỏng',
+            'assigned': 'Đã cấp phát cho giảng viên'
+        };
+
+        // Lấy ra danh sách các trạng thái từ dữ liệu
+        const statuses = Object.keys(statusData);
+
+        // Tạo danh sách nhãn và màu sắc theo đúng thứ tự
+        const labels = statuses.map(status => statusLabels[status] || status);
+        const backgroundColors = statuses.map(status => colorMap[status] || '#6c757d'); // Dùng màu xám mặc định nếu không có
 
         const data = {
             labels: labels,
             datasets: [{
                 data: Object.values(deviceCounts),
-                backgroundColor: [
-                    '#28a745', // Success - Có sẵn
-                    '#ffc107', // Warning - Đang chờ
-                    '#17a2b8', // Info - Đang sử dụng
-                    '#007bff', // Primary - Bảo trì
-                    '#dc3545'  // Danger - Hỏng
-                ],
+                backgroundColor: backgroundColors, // Sử dụng mảng màu đã tạo
                 borderWidth: 1
             }]
         };
@@ -137,7 +147,9 @@
                             label: function(context) {
                                 const label = context.label || '';
                                 const value = context.raw || 0;
-                                const percentage = statusData[Object.keys(statusData)[context.dataIndex]];
+                                // Tìm key tiếng Anh dựa trên label tiếng Việt để lấy %
+                                const statusKey = Object.keys(statusLabels).find(key => statusLabels[key] === label);
+                                const percentage = statusData[statusKey] || 0;
                                 return `${label}: ${value} (${percentage.toFixed(2)}%)`;
                             }
                         }

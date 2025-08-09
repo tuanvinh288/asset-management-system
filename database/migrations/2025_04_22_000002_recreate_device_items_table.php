@@ -27,7 +27,7 @@ return new class extends Migration
             $table->unsignedBigInteger('device_id');
             $table->string('code')->unique();
             $table->string('serial_number')->nullable();
-            $table->enum('status', ['available', 'in_use', 'maintenance', 'broken'])->default('available');
+            $table->enum('status', ['available', 'in_use', 'maintenance', 'broken', 'assigned'])->default('available');
             $table->unsignedBigInteger('supplier_id')->nullable();
             $table->string('qr_code')->nullable();
             $table->string('qr_token')->unique()->nullable();

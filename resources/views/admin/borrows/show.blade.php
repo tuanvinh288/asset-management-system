@@ -200,12 +200,10 @@
                                     </button>
                                 </form>
                             @elseif($borrow->status === 'approved')
-                                <form method="POST" action="{{ route('device-borrows.return', $borrow->id) }}" style="display:inline;">
-                                    @csrf
-                                    <button class="btn btn-primary">
-                                        <i class="fa fa-undo"></i> Trả thiết bị
-                                    </button>
-                                </form>
+                                <a href="{{ route('device-borrows.return', $borrow->id) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        <i class="fa fa-undo"></i> Trả thiết bị
+                                                    </a>
                             @endif
                             @endrole
                             @if($borrow->status === 'pending')

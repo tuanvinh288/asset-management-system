@@ -175,7 +175,7 @@
                 }
 
                 $.ajax({
-                    url: `/admin/device-items/${deviceId}/json`,
+                    url: `/admin/device-items/${deviceId}/json?maintenance=1`,
                     method: 'GET',
                     beforeSend: function() {
                         $('#device_items_list').html(

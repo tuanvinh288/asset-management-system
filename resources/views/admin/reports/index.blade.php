@@ -29,8 +29,8 @@
                                 <div class="col-md-4">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h5 class="card-title">Báo cáo tài sản theo phòng ban</h5>
-                                            <p class="card-text">Xem danh sách tài sản được phân bổ cho từng phòng ban</p>
+                                            <h5 class="card-title">Báo cáo danh sách phòng ban</h5>
+                                            <p class="card-text">Danh sách các phòng </p>
                                             <div class="d-flex">
                                                 <a href="{{ route('reports.department-assets') }}" class="btn btn-primary mr-2">Xem báo cáo</a>
                                                 <a href="{{ route('reports.export-department-assets-pdf') }}" class="btn btn-secondary mr-2">Xuất PDF</a>
