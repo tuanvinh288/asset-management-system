@@ -92,7 +92,7 @@
                 <ul aria-expanded="false">
                     <li><a href="{{ route('reports.index') }}">Tổng quan</a></li>
                     <li><a href="{{ route('reports.device-status') }}">Trạng thái thiết bị</a></li>
-                    <li><a href="{{ route('reports.department-assets') }}">Tài sản phòng ban</a></li>
+                    <li><a href="{{ route('reports.department-assets') }}">Danh sách phòng ban</a></li>
                     <li><a href="{{ route('reports.maintenance-costs') }}">Chi phí bảo trì</a></li>
                 </ul>
             </li>
