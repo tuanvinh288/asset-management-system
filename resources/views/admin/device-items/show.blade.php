@@ -20,7 +20,7 @@
                                 Danh mục <b>{{ $deviceItem->device->name ?? 'Không xác định' }}</b>
                             </h3>
                             <h4 class="text-center">
-                                Tên thiết b: <b>{{ $deviceItem->code }}</b>
+                                Tên thiết bị: <b>{{ $deviceItem->code }}</b>
                             </h4>
                             @if ($deviceItem->status == 'assigned')
                                 <h4 class="">
